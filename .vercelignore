@@ -1,0 +1,8 @@
+deploy/
+server.mjs
+polymarket-*.html
+polymarket-*.json
+polymarket-*.yaml
+fifwc-*.html
+fifwc-*.json
+README_DEPLOY.md

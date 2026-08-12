@@ -1,0 +1,4958 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Polymarket 比赛盘口</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --surface-soft: #f2f4f7;
+      --ink: #111827;
+      --muted: #697586;
+      --muted-2: #8b95a5;
+      --line: #e3e8ef;
+      --line-strong: #cfd8e3;
+      --blue: #1652f0;
+      --blue-soft: #eef4ff;
+      --green: #079455;
+      --red: #b42318;
+      --shadow: 0 8px 20px rgba(16, 24, 40, 0.06);
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      width: min(1240px, calc(100vw - 32px));
+      height: 58px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 850;
+      font-size: 19px;
+    }
+
+    .brand-mark {
+      width: 31px;
+      height: 31px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--blue);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      justify-self: end;
+      gap: 8px;
+    }
+
+    .ghost-btn,
+    .primary-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .primary-btn {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .page {
+      width: min(1240px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 18px 0 42px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .fixture-page {
+      display: grid;
+      gap: 20px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .fixture-page.hidden,
+    .detail-page.hidden,
+    .prop-detail-page.hidden {
+      display: none;
+    }
+
+    .sports-tabs {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      overflow-x: auto;
+      padding: 0 0 6px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .sports-tabs button {
+      height: 42px;
+      min-width: 66px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #20242a;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .sports-tabs button.active {
+      background: #f1f3f5;
+    }
+
+    .home-panel.hidden {
+      display: none;
+    }
+
+    .home-panel {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .fixture-card.hidden,
+    .prop-card.hidden {
+      display: none;
+    }
+
+    .props-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 0 0 6px;
+      scrollbar-width: none;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .props-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .props-tabs button {
+      min-width: max-content;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #20242a;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .props-tabs button.active {
+      background: #f1f3f5;
+    }
+
+    .fixture-head {
+      display: grid;
+      align-items: center;
+      padding: 0 18px 0;
+    }
+
+    .fixture-date {
+      margin: 0;
+      color: #20242a;
+      font-size: 28px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .fixture-card {
+      display: grid;
+      gap: 10px;
+      min-height: 0;
+      padding: 14px 22px 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .fixture-card:hover {
+      border-color: #cfd8e3;
+    }
+
+    .fixture-main {
+      display: grid;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .fixture-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      color: #738095;
+      font-size: 18px;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Matches now span ~40 competitions, so the league has to be visible or
+       unfamiliar club names are unplaceable. */
+    .fixture-league {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      padding: 3px 10px;
+      max-width: 46vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fixture-time {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: #f5f6f8;
+      color: #111827;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .fixture-teams {
+      display: grid;
+      gap: 9px;
+    }
+
+    .fixture-team {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .archive-entry {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+      padding: 13px 15px; border-radius: 14px; text-decoration: none; color: var(--ink);
+      background: linear-gradient(135deg, #fffaeb 0%, var(--surface) 60%);
+      border: 1px solid #f2e0b5; box-shadow: var(--shadow);
+    }
+    .archive-entry:hover { border-color: #e5cf9a; }
+    .archive-ico { font-size: 22px; line-height: 1; }
+    .archive-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+    .archive-txt b { font-size: 14.5px; font-weight: 850; }
+    .archive-txt small { font-size: 11.5px; color: var(--muted); }
+    .archive-arrow { color: #b7791f; font-size: 22px; font-weight: 700; line-height: 1; }
+
+    .fixture-team .flag {
+      width: 34px;
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--surface-soft);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25), 0 1px 2px rgba(16, 24, 40, .16); /* small flags: subtle shadow, not the big hero drop-shadow */
+      display: block; /* not grid: grid auto-rows let the square flag image overflow the box downward */
+      transform: translateY(var(--flag-nudge, 0px)); /* alignFlags() centers the box on the glyph (handles font line-box leading) */
+    }
+
+    .fixture-team .flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .fixture-team span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fixture-record {
+      color: #7a8492;
+      font-weight: 760;
+    }
+
+    .fixture-column {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .fixture-book {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-width: 112px;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: 15px;
+      background: #f5f6f8;
+      color: #111827;
+      font-size: 18px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .fixture-odd {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #edf0f3;
+      border-radius: 13px;
+      background: #f6f7f9;
+      color: #3c4148;
+      box-shadow: 0 6px 0 rgba(16, 24, 40, 0.18);
+      font-size: 21px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .fixture-odd b,
+    .fixture-odd strong {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fixture-odd.team-tone {
+      border-color: var(--team-border);
+      background: var(--team-bg);
+      color: var(--team-fg, #fff);
+      box-shadow: 0 6px 0 var(--team-shadow);
+    }
+
+    .fixture-odd.tone-draw {
+      border-color: #edf0f3;
+      background: #f5f6f8;
+      color: #30343a;
+      box-shadow: 0 6px 0 rgba(16, 24, 40, 0.18);
+    }
+
+    .fixture-odd.team-esp { --team-bg: #b71520; --team-border: #9d101b; --team-shadow: #850d17; }
+    .fixture-odd.team-cvi { --team-bg: #1f55a8; --team-border: #19498f; --team-shadow: #153c77; }
+    .fixture-odd.team-bel { --team-bg: #ef4050; --team-border: #d93243; --team-shadow: #ba2434; }
+    .fixture-odd.team-egy { --team-bg: #c1172d; --team-border: #a91326; --team-shadow: #8d1020; }
+    .fixture-odd.team-ksa { --team-bg: #137a3d; --team-border: #106a35; --team-shadow: #0c542a; }
+    .fixture-odd.team-ury { --team-bg: #1f55b5; --team-border: #19499b; --team-shadow: #143d82; }
+    .fixture-odd.team-irn { --team-bg: #239f40; --team-border: #1d8836; --team-shadow: #176f2c; }
+    .fixture-odd.team-nzl { --team-bg: #1f4fb2; --team-border: #194496; --team-shadow: #14397f; }
+    .fixture-odd.team-fra { --team-bg: #1f5aa6; --team-border: #194d8e; --team-shadow: #143f76; }
+    .fixture-odd.team-sen { --team-bg: #158047; --team-border: #116d3d; --team-shadow: #0d5831; }
+    .fixture-odd.team-irq { --team-bg: #c1172d; --team-border: #a91326; --team-shadow: #8d1020; }
+    .fixture-odd.team-nor { --team-bg: #ba0c2f; --team-border: #9d0a28; --team-shadow: #820820; }
+    .fixture-odd.team-arg { --team-bg: #55a8dc; --team-border: #438fc0; --team-shadow: #3476a0; }
+    .fixture-odd.team-alg { --team-bg: #006233; --team-border: #00522b; --team-shadow: #003f21; }
+    .fixture-odd.team-aut { --team-bg: #ed2939; --team-border: #cf2130; --team-shadow: #ad1a27; }
+    .fixture-odd.team-jor { --team-bg: #007a3d; --team-border: #006633; --team-shadow: #005229; }
+    .fixture-odd.team-prt { --team-bg: #0b7f3a; --team-border: #096b31; --team-shadow: #075527; }
+    .fixture-odd.team-cdr { --team-bg: #007fff; --team-border: #006bd6; --team-shadow: #0058b0; }
+    .fixture-odd.team-eng { --team-bg: #cf142b; --team-border: #ad1024; --team-shadow: #8f0d1d; }
+    .fixture-odd.team-hrv { --team-bg: #171796; --team-border: #12127d; --team-shadow: #0e0e63; }
+    .fixture-odd.team-gha { --team-bg: #ce1126; --team-border: #ad0e20; --team-shadow: #8d0b1a; }
+    .fixture-odd.team-pan { --team-bg: #005293; --team-border: #00457a; --team-shadow: #003761; }
+    .fixture-odd.team-uzb { --team-bg: #1eb6e7; --team-border: #199bc4; --team-shadow: #147fa1; }
+    .fixture-odd.team-col { --team-bg: #f4c400; --team-border: #d7ad00; --team-shadow: #b59000; --team-fg: #18202c; }
+    .fixture-odd.team-cze { --team-bg: #11457e; --team-border: #0e3a69; --team-shadow: #0a2e53; }
+    .fixture-odd.team-rsa { --team-bg: #007a4d; --team-border: #006740; --team-shadow: #005134; }
+    .fixture-odd.team-che { --team-bg: #d52b1e; --team-border: #b72419; --team-shadow: #961d14; }
+    .fixture-odd.team-bih { --team-bg: #002395; --team-border: #001d7b; --team-shadow: #001762; }
+    .fixture-odd.team-can { --team-bg: #d52b1e; --team-border: #b72419; --team-shadow: #961d14; }
+    .fixture-odd.team-qat { --team-bg: #8a1538; --team-border: #74122f; --team-shadow: #5d0e25; }
+
+    .fixture-empty {
+      min-height: 56px;
+      border-radius: 13px;
+      background: transparent;
+    }
+
+    .match-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .match-card,
+    .side-card,
+    .market-shell {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .match-card {
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .crumbs {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+      margin-bottom: 14px;
+    }
+
+    .hero-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .team.away {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .flag {
+      flex: 0 0 auto;
+      width: 62px;
+      height: 44px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: block; /* not grid: a square flag image's 1:1 ratio wins under place-items:center and overflows the box downward */
+      box-shadow: 0 1px 3px rgba(16, 24, 40, .16); /* soft lift only, no border frame — keeps white flags (e.g. Japan) readable on the white card */
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .flag-fr {
+      background: linear-gradient(90deg, #071f5f 0 33.33%, #fff 33.33% 66.66%, #c92032 66.66% 100%);
+    }
+
+    .flag-sn {
+      position: relative;
+      background: linear-gradient(90deg, #2f8f46 0 33.33%, #f7e463 33.33% 66.66%, #d43c35 66.66% 100%);
+    }
+
+    .flag-sn::after {
+      content: "★";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #15803d;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .flag-es {
+      background: linear-gradient(180deg, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75% 100%);
+    }
+
+    .flag-cv {
+      background:
+        linear-gradient(180deg, transparent 0 48%, #fff 48% 53%, #c8102e 53% 58%, #fff 58% 63%, transparent 63% 100%),
+        #163f8c;
+    }
+
+    .flag-be {
+      background: linear-gradient(90deg, #050505 0 33.33%, #ffd90c 33.33% 66.66%, #ef3340 66.66% 100%);
+    }
+
+    .flag-eg {
+      background: linear-gradient(180deg, #ce1126 0 33.33%, #fff 33.33% 66.66%, #000 66.66% 100%);
+    }
+
+    .flag-sa {
+      background: #176c3a;
+    }
+
+    .flag-uy {
+      background:
+        radial-gradient(circle at 20% 24%, #f6c744 0 10%, transparent 11%),
+        repeating-linear-gradient(180deg, #fff 0 11%, #2453a6 11% 22%);
+    }
+
+    .flag-ir {
+      background: linear-gradient(180deg, #239f40 0 33.33%, #fff 33.33% 66.66%, #da0000 66.66% 100%);
+    }
+
+    .flag-nz {
+      background: #012169;
+    }
+
+    .flag-iq {
+      background: linear-gradient(180deg, #ce1126 0 33.33%, #fff 33.33% 66.66%, #000 66.66% 100%);
+    }
+
+    .flag-no {
+      background:
+        linear-gradient(90deg, transparent 0 26%, #fff 26% 34%, #00205b 34% 45%, #fff 45% 53%, transparent 53% 100%),
+        linear-gradient(180deg, transparent 0 38%, #fff 38% 47%, #00205b 47% 58%, #fff 58% 67%, transparent 67% 100%),
+        #ba0c2f;
+    }
+
+    .flag-ar {
+      background:
+        radial-gradient(circle at 50% 50%, #f6c945 0 7%, transparent 8%),
+        linear-gradient(180deg, #75aadb 0 33.33%, #fff 33.33% 66.66%, #75aadb 66.66% 100%);
+    }
+
+    .flag-dz {
+      background:
+        radial-gradient(circle at 55% 50%, transparent 0 11%, #d21034 12% 17%, transparent 18%),
+        linear-gradient(90deg, #006233 0 50%, #fff 50% 100%);
+    }
+
+    .flag-at {
+      background: linear-gradient(180deg, #ed2939 0 33.33%, #fff 33.33% 66.66%, #ed2939 66.66% 100%);
+    }
+
+    .flag-jo {
+      background:
+        linear-gradient(34deg, #ce1126 0 34%, transparent 35%),
+        linear-gradient(180deg, #000 0 33.33%, #fff 33.33% 66.66%, #007a3d 66.66% 100%);
+    }
+
+    .flag-pt {
+      background: linear-gradient(90deg, #006600 0 40%, #ff0000 40% 100%);
+    }
+
+    .flag-cd {
+      background:
+        linear-gradient(145deg, transparent 0 42%, #f7d618 42% 47%, #ce1021 47% 55%, #f7d618 55% 60%, transparent 60%),
+        #007fff;
+    }
+
+    .flag-eng {
+      background:
+        linear-gradient(90deg, transparent 0 43%, #cf142b 43% 57%, transparent 57% 100%),
+        linear-gradient(180deg, transparent 0 38%, #cf142b 38% 62%, transparent 62% 100%),
+        #fff;
+    }
+
+    .flag-hr {
+      background: linear-gradient(180deg, #f00 0 33.33%, #fff 33.33% 66.66%, #171796 66.66% 100%);
+    }
+
+    .flag-gh {
+      background:
+        radial-gradient(circle at 50% 50%, #111 0 8%, transparent 9%),
+        linear-gradient(180deg, #ce1126 0 33.33%, #fcd116 33.33% 66.66%, #006b3f 66.66% 100%);
+    }
+
+    .flag-pa {
+      background:
+        linear-gradient(90deg, #fff 0 50%, #d21034 50% 100%) 0 0 / 100% 50% no-repeat,
+        linear-gradient(90deg, #005293 0 50%, #fff 50% 100%) 0 100% / 100% 50% no-repeat;
+    }
+
+    .flag-uz {
+      background: linear-gradient(180deg, #1eb6e7 0 30%, #fff 30% 36%, #ce1126 36% 39%, #fff 39% 64%, #ce1126 64% 67%, #fff 67% 70%, #009739 70% 100%);
+    }
+
+    .flag-co {
+      background: linear-gradient(180deg, #fcd116 0 50%, #003893 50% 75%, #ce1126 75% 100%);
+    }
+
+    .flag-cz {
+      background:
+        linear-gradient(32deg, #11457e 0 38%, transparent 39%),
+        linear-gradient(180deg, #fff 0 50%, #d7141a 50% 100%);
+    }
+
+    .flag-za {
+      background:
+        linear-gradient(35deg, transparent 0 32%, #ffb612 32% 38%, #007a4d 38% 47%, #fff 47% 55%, transparent 55%),
+        linear-gradient(145deg, transparent 0 32%, #ffb612 32% 38%, #007a4d 38% 47%, #fff 47% 55%, transparent 55%),
+        linear-gradient(180deg, #de3831 0 50%, #002395 50% 100%);
+    }
+
+    .flag-ch {
+      background:
+        linear-gradient(90deg, transparent 0 38%, #fff 38% 62%, transparent 62% 100%),
+        linear-gradient(180deg, transparent 0 38%, #fff 38% 62%, transparent 62% 100%),
+        #d52b1e;
+    }
+
+    .flag-ba {
+      background:
+        linear-gradient(128deg, transparent 0 52%, #fcd116 53% 72%, transparent 73%),
+        #002395;
+    }
+
+    .flag-ca {
+      background: linear-gradient(90deg, #d52b1e 0 25%, #fff 25% 75%, #d52b1e 75% 100%);
+    }
+
+    .flag-qa {
+      background: linear-gradient(90deg, #fff 0 25%, #8a1538 25% 100%);
+    }
+
+    .fixture-list {
+      display: grid;
+      gap: 24px;
+    }
+
+    .props-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .prop-card {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+      min-height: 132px;
+      padding: 12px 14px 10px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .prop-card:hover {
+      border-color: #cfd8e3;
+    }
+
+    .prop-card-title {
+      color: #111827;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .prop-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .prop-card-icon {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.7) 0 24%, transparent 25%),
+        conic-gradient(#d93025 0 14%, #fbbc04 14% 26%, #1a73e8 26% 42%, #34a853 42% 60%, #111827 60% 74%, #e5e7eb 74% 86%, #d93025 86% 100%);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.55), 0 4px 10px rgba(16, 24, 40, .12);
+      font-size: 18px;
+      overflow: hidden;
+    }
+
+    .prop-card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .prop-card-picks {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .prop-pick-row {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 28px;
+    }
+
+    .prop-pick-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #101418;
+      font-size: 15px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .prop-pick-percent {
+      color: #05070a;
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prop-pick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 38px);
+      gap: 5px;
+    }
+
+    .prop-action-btn {
+      display: grid;
+      place-items: center;
+      min-height: 27px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .prop-yes-btn {
+      background: #e4f8ee;
+      color: #2f9e67;
+    }
+
+    .prop-no-btn {
+      background: #fdecee;
+      color: #d14343;
+    }
+
+    .prop-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: #7a8492;
+      font-size: 14px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .prop-card-tools {
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      color: #737d88;
+    }
+
+    .prop-card-tools svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .map-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .map-card,
+    .map-rank-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .map-card {
+      min-width: 0;
+      overflow: hidden;
+      padding: 14px;
+    }
+
+    .map-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .map-title {
+      margin: 0;
+      color: #111827;
+      font-size: 22px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .map-subtitle {
+      margin: 5px 0 0;
+      color: #7a8492;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .map-updated {
+      color: #7a8492;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .world-map {
+      width: 100%;
+      min-height: 420px;
+      display: block;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 48% 44%, rgba(255,255,255,.98), rgba(241,245,249,.94) 44%, rgba(226,232,240,.78) 64%, rgba(248,250,252,.96) 100%);
+    }
+
+    .globe-wrap {
+      position: relative;
+      min-height: 420px;
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 45%, #ffffff 0 28%, #eef3f8 58%, #f8fafc 100%);
+    }
+
+    .globe-canvas {
+      width: 100%;
+      height: 420px;
+      display: block;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+
+    .globe-canvas.dragging {
+      cursor: grabbing;
+    }
+
+    .globe-label-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .globe-country-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      max-width: 120px;
+      padding: 4px 7px;
+      border: 1px solid rgba(226, 232, 240, .86);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      color: #111827;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.1;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .globe-country-label span {
+      color: #64748b;
+      font-weight: 850;
+    }
+
+    .globe-tip {
+      position: absolute;
+      left: 14px;
+      bottom: 12px;
+      max-width: calc(100% - 28px);
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 850;
+      backdrop-filter: blur(10px);
+    }
+
+    .map-rank-card {
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .map-rank-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .map-rank-head h3 {
+      margin: 0;
+      color: #111827;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .map-rank-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .map-rank-row {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #20242a;
+      text-decoration: none;
+    }
+
+    .map-rank-row strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .map-rank-row span {
+      color: #7a8492;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .map-rank-row b {
+      color: #111827;
+      font-size: 14px;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 6px;
+      border-top: 1px solid var(--line);
+      border-radius: 10px;
+      color: #20242a;
+      text-decoration: none;
+    }
+
+    .rank-row:first-child {
+      border-top: 0;
+    }
+
+    .rank-row:hover {
+      background: #f4f7fb;
+    }
+
+    .rank-row.active {
+      background: #e9f1fb;
+    }
+
+    .rank-flag {
+      width: 26px;
+      height: 17px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--surface-soft);
+      box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .08);
+    }
+
+    .rank-flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .rank-main {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .rank-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .rank-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--surface-soft);
+      overflow: hidden;
+    }
+
+    .rank-bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 2px;
+      background: #aab8f0;
+    }
+
+    .rank-pill {
+      justify-self: end;
+      min-width: 46px;
+      text-align: center;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rank-pill.p-hi {
+      background: #2f5fd0;
+      color: #fff;
+    }
+
+    .rank-pill.p-mid {
+      background: #93a6ed;
+      color: #1b2b6b;
+    }
+
+    .rank-pill.p-lo {
+      background: #dbe3f6;
+      color: #3a4a86;
+    }
+
+    .globe-pop {
+      position: absolute;
+      transform: translate(-50%, calc(-100% - 10px));
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 9px;
+      border: 1px solid rgba(226, 232, 240, .9);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .95);
+      color: #111827;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .14);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+    }
+
+    .globe-pop img {
+      width: 20px;
+      height: 13px;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    .globe-pop span {
+      color: #16467e;
+    }
+
+    @media (max-width: 700px) {
+      .rank-name { font-size: 13px; }
+      .rank-pill { min-width: 42px; font-size: 12px; padding: 4px 6px; }
+      .globe-pop { font-size: 12px; }
+    }
+
+    .globe-mk {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px 2px 3px;
+      border: 1px solid rgba(180, 195, 215, .75);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .94);
+      color: #16467e;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, .14);
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .globe-mk img {
+      width: 18px;
+      height: 12px;
+      border-radius: 2px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .globe-mk.sel {
+      background: #16467e;
+      color: #fff;
+      border-color: #0c447c;
+      box-shadow: 0 6px 16px rgba(12, 68, 124, .45);
+    }
+
+    .prop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      color: #738095;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .prop-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #f1f3f5;
+      color: #596273;
+    }
+
+    .prop-outcomes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .prop-odd {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 54px;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: #f3f4f6;
+      box-shadow: inset 0 -6px rgba(0, 0, 0, 0.18);
+      color: #2f3338;
+      font-size: 17px;
+      font-weight: 900;
+      overflow: hidden;
+    }
+
+    .prop-odd span:first-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #6b7280;
+    }
+
+    .prop-odd.hot {
+      background: #1f5aa6;
+      box-shadow: inset 0 -6px rgba(9, 45, 112, 0.55);
+      color: #fff;
+    }
+
+    .prop-odd.hot span:first-child {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .team-name {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: clamp(22px, 3.2vw, 32px);
+      line-height: 1;
+      font-weight: 880;
+    }
+
+    .team-label {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .vs {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .meta-pill,
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--muted);
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status {
+      border-color: #b7e4c7;
+      background: #ecfdf3;
+      color: var(--green);
+    }
+
+    .status.error {
+      border-color: #fecdca;
+      background: #fff1f3;
+      color: var(--red);
+    }
+
+    .side-card {
+      padding: 15px;
+    }
+
+    .side-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 820;
+    }
+
+    .stat-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 34px;
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .stat-row strong {
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 820;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .chart-card {
+      margin-bottom: 16px;
+      padding: 18px 18px 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .chart-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      min-height: 42px;
+      margin-bottom: 8px;
+    }
+
+    .chart-volume {
+      color: #667085;
+      font-size: 18px;
+      font-weight: 820;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chart-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 780;
+    }
+
+    .switch-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 36px;
+      padding: 0 13px;
+      border-radius: 12px;
+      background: #e9efff;
+      color: var(--blue);
+    }
+
+    .switch-pill svg,
+    .switch-muted svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .switch-muted {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .chart-brand {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #a6afbc;
+      font-size: 22px;
+      font-weight: 850;
+    }
+
+    .chart-brand svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .chart-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chart-canvas {
+      width: 100%;
+      min-height: 292px;
+    }
+
+    .chart-canvas svg {
+      display: block;
+      width: 100%;
+      height: 292px;
+    }
+
+    .chart-axis {
+      fill: #6b7280;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chart-grid {
+      stroke: #cbd5e1;
+      stroke-width: 1;
+      stroke-dasharray: 1 6;
+    }
+
+    .chart-line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .chart-fade {
+      fill: none;
+      stroke: #e9edf3;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .chart-dot {
+      stroke: #fff;
+      stroke-width: 3;
+    }
+
+    .chart-crosshair {
+      stroke: #d7dce5;
+      stroke-width: 1.5;
+    }
+
+    .chart-hitbox {
+      fill: transparent;
+      cursor: crosshair;
+      pointer-events: all;
+      touch-action: none;
+    }
+
+    .chart-focus-label,
+    .chart-focus-date {
+      font-size: 18px;
+      font-weight: 950;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 6px;
+      stroke-linejoin: round;
+    }
+
+    .chart-focus-date {
+      fill: #667085;
+      font-size: 13px;
+    }
+
+    .chart-end-name {
+      font-size: 18px;
+      font-weight: 800;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 5px;
+      stroke-linejoin: round;
+    }
+
+    .chart-end-pct {
+      font-size: 46px;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 6px;
+      stroke-linejoin: round;
+    }
+
+    .chart-legend {
+      display: grid;
+      grid-template-columns: minmax(92px, 0.7fr) repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+      margin: 2px 6px 0;
+    }
+
+    .legend-time {
+      color: #7b8492;
+      font-size: 16px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      padding-bottom: 4px;
+    }
+
+    .legend-row {
+      display: grid;
+      gap: 2px;
+      font-variant-numeric: tabular-nums;
+      min-width: 0;
+    }
+
+    .legend-row span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 18px;
+      font-weight: 840;
+    }
+
+    .legend-row strong {
+      font-size: 44px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .range-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .range-buttons button {
+      min-width: 46px;
+      height: 34px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 840;
+      cursor: pointer;
+    }
+
+    .range-buttons button.active,
+    .range-buttons button:hover {
+      color: var(--ink);
+      background: var(--surface-soft);
+    }
+
+    .market-shell {
+      overflow: hidden;
+    }
+
+    .market-tabs {
+      position: sticky;
+      top: 58px;
+      z-index: 10;
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      overflow-x: auto;
+      padding: 0 18px;
+      min-height: 68px;
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .market-tabs button {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      height: 68px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: clamp(20px, 2.4vw, 30px);
+      line-height: 68px;
+      font-weight: 850;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .market-tabs button.active,
+    .market-tabs button:hover {
+      color: var(--ink);
+    }
+
+    .market-tabs button.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      border-radius: 999px 999px 0 0;
+      background: var(--blue);
+    }
+
+    .market-tabs span {
+      color: var(--muted-2);
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .sections {
+      padding: 2px 0 8px;
+    }
+
+    .market-section {
+      scroll-margin-top: 144px;
+      padding: 16px 18px 0;
+    }
+
+    .subsection {
+      padding: 0 18px 18px;
+    }
+
+    .subsection + .subsection {
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .subsection-title {
+      margin: 8px 0 22px;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .section-head span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .market-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .market-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 34%);
+      align-items: center;
+      gap: 18px;
+      min-height: 118px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .market-row.has-selector {
+      padding-bottom: 0;
+    }
+
+    .market-row.hidden {
+      display: none;
+    }
+
+    .prop-detail-page {
+      display: grid;
+      gap: 14px;
+    }
+
+    .prop-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 16px;
+    }
+
+    .prop-hero-card,
+    .prop-summary-card {
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .prop-hero-card h1 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.05;
+      font-weight: 900;
+    }
+
+    .prop-hero-card p {
+      margin: 12px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .prop-detail-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .prop-market-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 30%);
+      align-items: center;
+      gap: 18px;
+      min-height: 104px;
+      padding: 15px 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .prop-market-row.hidden {
+      display: none;
+    }
+
+    .prop-market-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 19px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .prop-market-question {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .prop-market-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .prop-back {
+      width: fit-content;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 850;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .market-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0;
+    }
+
+    .market-copy {
+      min-width: 0;
+    }
+
+    .market-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 720;
+    }
+
+    .market-kicker i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .market-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.3;
+      font-weight: 880;
+      word-break: break-word;
+    }
+
+    .market-question {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .market-state {
+      flex: 0 0 auto;
+      min-width: 44px;
+      text-align: right;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 820;
+    }
+
+    .market-state.closed {
+      color: var(--red);
+    }
+
+    .outcomes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 0;
+    }
+
+    .outcomes.count-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .outcome {
+      min-width: 0;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 14px;
+      border: 1px solid #edf0f3;
+      border-radius: 10px;
+      background: #f6f7f9;
+      color: #344054;
+      box-shadow: 0 7px 0 rgba(16, 24, 40, 0.18);
+      font-variant-numeric: tabular-nums;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .outcome:hover {
+      border-color: #d7dce3;
+      background: #f1f3f6;
+    }
+
+    .outcome.blue {
+      border-color: #1d4f91;
+      background: #19559d;
+      color: #dbeafe;
+      box-shadow: 0 7px 0 #0b3672;
+    }
+
+    .outcome.green {
+      border-color: #6fb08d;
+      background: #75b08e;
+      color: #ecfdf3;
+      box-shadow: 0 7px 0 #579272;
+    }
+
+    .outcome b {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #344054;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .outcome.blue b,
+    .outcome.blue strong,
+    .outcome.green b,
+    .outcome.green strong {
+      color: inherit;
+    }
+
+    .outcome strong {
+      color: #2f343b;
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 880;
+    }
+
+    .outcome.selected,
+    .outcome.blue.selected,
+    .outcome.green.selected {
+      border-color: var(--sel-bg, var(--blue));
+      background: var(--sel-bg, var(--blue));
+      color: var(--sel-fg, #fff);
+      box-shadow: 0 7px 0 var(--sel-shadow, #0b3aa6);
+    }
+
+    .outcome.selected b,
+    .outcome.selected strong {
+      color: var(--sel-fg, #fff);
+    }
+
+    .line-selector {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 42px;
+      align-items: center;
+      min-height: 58px;
+      margin: 16px -18px 0;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .line-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 300;
+    }
+
+    .line-options {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(22px, 5vw, 54px);
+      overflow-x: auto;
+      min-width: 0;
+      padding: 0 8px;
+    }
+
+    .line-options button {
+      position: relative;
+      height: 58px;
+      padding: 0 4px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 850;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .line-options button.active {
+      color: var(--ink);
+      font-size: 21px;
+    }
+
+    .line-options button.active::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -1px;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 11px solid var(--blue);
+    }
+
+    .right-rail {
+      position: sticky;
+      top: 76px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .moneyline {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .moneyline-row {
+      display: grid;
+      align-items: center;
+      gap: 4px;
+      min-height: 42px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d9e6ff;
+      background: #f1f6ff;
+      font-size: 13px;
+      font-weight: 760;
+      text-align: center;
+    }
+
+    .moneyline-row span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .moneyline-row strong {
+      color: var(--blue);
+      font-size: 17px;
+      font-weight: 880;
+    }
+
+    .rail-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .empty {
+      margin: 18px;
+      padding: 34px 18px;
+      text-align: center;
+      border: 1px dashed var(--line-strong);
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    footer {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .topbar-inner {
+        grid-template-columns: auto 1fr;
+      }
+
+      .top-actions {
+        display: none;
+      }
+
+      .match-hero,
+      .prop-hero,
+      .chart-body,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .right-rail {
+        position: static;
+        order: -1;
+      }
+
+      .fixture-head {
+        display: none;
+      }
+
+      .fixture-card {
+        grid-template-columns: 1fr;
+        min-height: 0;
+      }
+
+      .fixture-column {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .fixture-book {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .topbar-inner,
+      .page {
+        width: min(680px, calc(100vw - 20px));
+      }
+
+      .topbar-inner {
+        height: auto;
+        min-height: 56px;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px 0;
+      }
+
+      .brand {
+        font-size: 18px;
+      }
+
+      .match-card {
+        padding: 14px;
+      }
+
+      .hero-main {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .team,
+      .team.away {
+        justify-content: flex-start;
+        text-align: left;
+      }
+
+      .team.away {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+      }
+
+      .vs {
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
+        justify-content: flex-start;
+      }
+
+      .team-name {
+        font-size: 34px;
+      }
+
+      .market-tabs {
+        top: 57px;
+        min-height: 46px;
+        gap: 18px;
+        padding: 0 14px;
+      }
+
+      .market-tabs button {
+        height: 46px;
+        line-height: 46px;
+        font-size: 16px;
+      }
+
+      .market-section {
+        scroll-margin-top: 110px;
+        padding: 14px 12px 0;
+      }
+
+      .subsection {
+        padding: 0 12px 16px;
+      }
+
+      .subsection-title {
+        margin: 6px 0 14px;
+        font-size: 17px;
+      }
+
+      .market-head {
+        display: block;
+      }
+
+      .market-state {
+        margin-top: 7px;
+        text-align: left;
+      }
+
+      .outcomes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .outcomes.count-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .market-row {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 14px;
+      }
+
+      .prop-market-row {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 14px;
+      }
+
+      .market-row.has-selector {
+        padding-bottom: 0;
+      }
+
+      .line-selector {
+        margin: 14px -14px 0;
+      }
+
+      .chart-card {
+        padding: 14px 8px;
+      }
+
+      .chart-top {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-switch {
+        justify-self: start;
+      }
+
+      .chart-brand {
+        display: none;
+      }
+
+      .chart-body {
+        gap: 10px;
+      }
+
+      .chart-canvas,
+      .chart-canvas svg {
+        min-height: 240px;
+        height: 240px;
+      }
+
+      .chart-legend {
+        grid-template-columns: minmax(58px, 0.55fr) repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        margin: 0;
+      }
+
+      .legend-time {
+        font-size: 13px;
+      }
+
+      .legend-row span {
+        font-size: 12px;
+      }
+
+      .legend-row strong {
+        font-size: 28px;
+      }
+
+      .chart-focus-label {
+        font-size: 15px;
+        stroke-width: 5px;
+      }
+
+      .fixture-date {
+        font-size: 23px;
+      }
+
+      .fixture-card {
+        gap: 8px;
+        padding: 11px 12px 13px;
+        border-radius: 17px;
+      }
+
+      .fixture-main {
+        gap: 8px;
+      }
+
+      .fixture-team {
+        gap: 10px;
+        font-size: 16px;
+      }
+
+      .fixture-team .flag {
+        width: 28px;
+        height: 20px;
+        border-radius: 5px;
+      }
+
+      .fixture-teams {
+        gap: 7px;
+      }
+
+      .fixture-meta {
+        gap: 9px;
+        font-size: 14px;
+      }
+
+      .fixture-league { font-size: 11.5px; padding: 2px 8px; }
+
+      .fixture-time {
+        min-height: 25px;
+        padding: 0 9px;
+        border-radius: 8px;
+        font-size: 15px;
+      }
+
+      .fixture-column {
+        gap: 6px;
+      }
+
+      .fixture-odd {
+        min-height: 38px;
+        border-radius: 10px;
+        padding: 5px 4px;
+        gap: 3px;
+        font-size: 12px;
+        box-shadow: 0 5px 0 rgba(16, 24, 40, 0.18);
+      }
+
+      .fixture-odd.team-tone,
+      .fixture-odd.tone-draw {
+        box-shadow: 0 5px 0 var(--fixture-mobile-shadow, rgba(16, 24, 40, 0.18));
+      }
+
+      .fixture-odd.team-tone {
+        --fixture-mobile-shadow: var(--team-shadow);
+      }
+
+      .fixture-odd b,
+      .fixture-odd strong {
+        flex: 0 1 auto;
+      }
+
+      .fixture-empty {
+        min-height: 38px;
+        border-radius: 10px;
+      }
+
+      .sports-tabs {
+        gap: 10px;
+        padding-bottom: 6px;
+      }
+
+      .sports-tabs button {
+        height: 40px;
+        min-width: 60px;
+        padding: 0 13px;
+        font-size: 16px;
+      }
+
+      .props-tabs {
+        gap: 10px;
+        padding-bottom: 6px;
+      }
+
+      .props-tabs button {
+        min-height: 38px;
+        padding: 0 13px;
+        font-size: 16px;
+      }
+
+      .props-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .map-shell {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .map-card {
+        padding: 10px;
+        border-radius: 17px;
+      }
+
+      .map-card-head {
+        margin-bottom: 6px;
+      }
+
+      .map-title {
+        font-size: 17px;
+      }
+
+      .map-subtitle,
+      .map-updated {
+        font-size: 12px;
+      }
+
+      .map-updated {
+        display: none;
+      }
+
+      .world-map {
+        min-height: 260px;
+      }
+
+      .globe-wrap {
+        min-height: 290px;
+      }
+
+      .globe-canvas {
+        height: 290px;
+      }
+
+      .globe-country-label {
+        max-width: 96px;
+        padding: 3px 6px;
+        font-size: 10px;
+      }
+
+      .globe-tip {
+        font-size: 11px;
+      }
+
+      .map-rank-card {
+        padding: 10px;
+        border-radius: 17px;
+      }
+
+      .prop-card {
+        min-height: 130px;
+        padding: 11px 12px 10px;
+        gap: 7px;
+        border-radius: 18px;
+      }
+
+      .prop-card-title {
+        font-size: 16px;
+      }
+
+      .prop-card-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+      }
+
+      .prop-card-header {
+        gap: 10px;
+      }
+
+      .prop-card-picks {
+        gap: 5px;
+      }
+
+      .prop-pick-row {
+        grid-template-columns: minmax(0, 1fr) 40px 80px;
+        gap: 6px;
+        min-height: 27px;
+      }
+
+      .prop-pick-name {
+        font-size: 15px;
+      }
+
+      .prop-pick-percent {
+        font-size: 16px;
+        text-align: right;
+      }
+
+      .prop-pick-actions {
+        grid-template-columns: repeat(2, 38px);
+        gap: 4px;
+      }
+
+      .prop-action-btn {
+        min-height: 27px;
+        border-radius: 7px;
+        font-size: 12px;
+      }
+
+      .prop-card-footer {
+        font-size: 14px;
+      }
+
+      .prop-card-tools {
+        gap: 14px;
+      }
+
+      .prop-card-tools svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .prop-odd {
+        min-height: 48px;
+        border-radius: 12px;
+        font-size: 14px;
+      }
+
+      .range-buttons {
+        justify-content: flex-start;
+        overflow-x: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .team-name { font-size: 22px; }
+      .team-label { font-size: 12px; margin-top: 4px; }
+      .crumbs { font-size: 12px; margin-bottom: 10px; }
+      .section-head h2 { font-size: 16px; }
+      .market-title { font-size: 15px; }
+      .market-question { font-size: 13px; }
+      .market-kicker { font-size: 11px; }
+      .outcome { min-height: 46px; padding: 9px 12px; }
+      .outcome b { font-size: 14px; }
+      .outcome strong { font-size: 15px; }
+      .line-options button { font-size: 15px; height: 50px; }
+      .line-options button.active { font-size: 17px; }
+      .line-selector { min-height: 50px; }
+      .meta-pill, .status { font-size: 12px; min-height: 30px; }
+    }
+    .match-hero { grid-template-columns: 1fr; }
+    .match-hero > .side-card { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    .right-rail { display: none; }
+    .hero-main { grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: start; }
+    .hero-main .team, .hero-main .team.away { flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; text-align: center; }
+    .hero-main .team-name { font-size: 24px; line-height: 1.15; white-space: normal; }
+    .hero-main .team-label { display: none; }
+    .hero-main .flag { width: 64px; height: 46px; }
+    .kickoff { text-align: center; white-space: nowrap; padding-top: 8px; }
+    .kickoff-time { font-size: 18px; font-weight: 850; color: var(--ink); }
+    .kickoff-date { margin-top: 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+    @media (max-width: 700px) {
+      .hero-main { grid-template-columns: 1fr auto 1fr; gap: 8px; }
+      .hero-main .team-name { font-size: 18px; }
+      .hero-main .flag { width: 52px; height: 37px; }
+      .kickoff-time { font-size: 15px; }
+      .kickoff-date { font-size: 12px; }
+    }
+    .sports-tabs { align-items: center; }
+    .home-toolbar { display: flex; align-items: center; gap: 12px; }
+    .home-toolbar .sports-tabs { flex: 1 1 auto; min-width: 0; }
+    .odds-fmt { position: relative; flex: 0 0 auto; }
+    .odds-fmt-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: #5f6b7a; cursor: pointer; }
+    .odds-fmt-btn svg { width: 20px; height: 20px; }
+    .odds-fmt-btn:hover { border-color: var(--line-strong); color: #20242a; }
+    .odds-fmt-menu { position: absolute; top: 46px; right: 0; z-index: 40; min-width: 184px; padding: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 16px 40px rgba(16, 24, 40, .16); }
+    .odds-fmt-menu[hidden] { display: none; }
+    .odds-fmt-title { padding: 8px 12px 6px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .odds-fmt-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 9px; color: #20242a; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .odds-fmt-item:hover, .odds-fmt-item.active { background: var(--surface-soft); }
+    .odds-fmt-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); opacity: 0; }
+    .odds-fmt-item.active .odds-fmt-dot { opacity: 1; }
+    @media (max-width: 700px) {
+      .odds-fmt-btn { width: 36px; height: 36px; }
+      .odds-fmt-menu { min-width: 164px; }
+      .odds-fmt-item { font-size: 14px; padding: 9px 12px; }
+    }
+    #chart-switch button { border: 0; font: inherit; cursor: pointer; }
+    .live-stats { padding: 6px 4px 2px; display: grid; gap: 18px; justify-items: center; }
+    .live-stats.hidden, .chart-body.hidden, #chart-ranges.hidden { display: none; }
+    .ls-badge { padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 850; }
+    .ls-badge.ls-live { background: #fdecee; color: #d14343; }
+    .ls-badge.ls-ended { background: #eef1f5; color: #5f6b7a; }
+    .ls-badge.ls-pre { background: #eef4ff; color: #1652f0; }
+    .ls-score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; width: 100%; max-width: 520px; }
+    .ls-team { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 18px; font-weight: 900; }
+    .ls-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ls-team.ls-away { justify-content: flex-end; text-align: right; }
+    .ls-team .flag { flex: 0 0 auto; width: 40px; height: 28px; border-radius: 6px; overflow: hidden; background: var(--surface-soft); }
+    .ls-team .flag img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ls-nums { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+    .ls-nums b { font-size: 40px; font-weight: 900; line-height: 1; }
+    .ls-nums i { color: var(--muted); font-style: normal; font-size: 22px; }
+    .ls-prob { width: 100%; max-width: 520px; display: grid; gap: 8px; }
+    .ls-prob-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--surface-soft); }
+    .ls-prob-bar span { display: block; height: 100%; }
+    .ls-prob-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; color: var(--muted); font-size: 13px; font-weight: 800; }
+    .ls-kick { display: grid; justify-items: center; gap: 2px; }
+    .ls-kick span { font-size: 17px; font-weight: 900; }
+    .ls-kick small { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .ls-countdown { display: flex; gap: 10px; justify-content: center; }
+    .ls-countdown .cd-box { display: grid; justify-items: center; gap: 4px; min-width: 56px; padding: 10px 8px; border-radius: 12px; background: var(--surface-soft); }
+    .ls-countdown .cd-box b { font-size: 26px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .ls-countdown .cd-box span { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .ls-result { color: var(--muted); font-size: 14px; font-weight: 850; }
+    .sr-lmt { width: 100%; }
+    @media (max-width: 700px) {
+      .ls-nums b { font-size: 32px; }
+      .ls-team { font-size: 15px; }
+      .ls-team .flag { width: 34px; height: 24px; }
+      .ls-countdown { gap: 8px; }
+      .ls-countdown .cd-box { min-width: 48px; padding: 8px 6px; }
+      .ls-countdown .cd-box b { font-size: 22px; }
+      .ls-kick span { font-size: 15px; }
+    }
+
+    /* ===== Combo (parlay) calculator ===== */
+    .combo-bar {
+      position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+      width: min(560px, calc(100% - 24px)); z-index: 60;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 8px 8px 16px; border-radius: 16px;
+      background: #fff; border: 1px solid var(--line);
+      box-shadow: 0 12px 32px rgba(16, 24, 40, 0.18);
+    }
+    .combo-bar[hidden] { display: none; }
+    .combo-bar-main { flex: 1; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; font: inherit; cursor: pointer; color: #18202c; font-size: 16px; font-weight: 850; min-width: 0; }
+    .combo-bar-ico { display: inline-flex; flex: 0 0 auto; }
+    .combo-bar-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .combo-bar-mult { margin-left: auto; color: var(--blue); font-weight: 900; font-variant-numeric: tabular-nums; }
+    .combo-bar-clear { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 10px; border: 0; background: var(--surface-soft); color: var(--muted); font-size: 15px; cursor: pointer; }
+    body.combo-bar-on .fixture-list,
+    body.combo-bar-on #sections { padding-bottom: 84px; }
+
+    .combo-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(16, 24, 40, 0.4); }
+    .combo-backdrop[hidden] { display: none; }
+    .combo-sheet {
+      position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
+      width: min(560px, 100%); z-index: 80; background: #fff;
+      border-radius: 20px 20px 0 0; padding: 8px 18px calc(18px + env(safe-area-inset-bottom));
+      box-shadow: 0 -12px 40px rgba(16, 24, 40, 0.2); max-height: 82vh; overflow-y: auto;
+    }
+    .combo-sheet[hidden] { display: none; }
+    .combo-sheet-grip { width: 40px; height: 4px; border-radius: 999px; background: #d7dce5; margin: 4px auto 10px; }
+    .combo-sheet-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .combo-sheet-title { font-size: 18px; font-weight: 900; }
+    .combo-beta { padding: 3px 9px; border-radius: 999px; background: #f0ebff; color: #7b5cff; font-size: 12px; font-weight: 800; }
+    .combo-sheet-close { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 10px; background: var(--surface-soft); color: var(--muted); font-size: 15px; cursor: pointer; }
+
+    .combo-legs { display: grid; gap: 2px; }
+    .combo-leg { display: flex; align-items: center; gap: 10px; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+    .combo-leg-info { flex: 1; min-width: 0; }
+    .combo-leg-match { color: var(--muted); font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .combo-leg-pick { display: flex; align-items: center; gap: 7px; font-size: 16px; font-weight: 850; margin-top: 2px; }
+    .combo-leg-pick em { color: var(--muted); font-style: normal; font-size: 13px; font-weight: 800; }
+    .combo-flag { width: 22px; height: 16px; border-radius: 3px; overflow: hidden; background: var(--surface-soft); flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: var(--muted); }
+    .combo-flag img { width: 100%; height: 100%; object-fit: cover; }
+    .combo-toggle { display: inline-flex; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+    .combo-toggle button { border: 0; background: #fff; color: var(--muted); font: inherit; font-weight: 850; font-size: 14px; padding: 6px 12px; cursor: pointer; }
+    .combo-toggle button.on { background: #e9f8ef; color: #1c8a4e; }
+    .combo-leg-remove { flex: 0 0 auto; width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--surface-soft); color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; }
+
+    .combo-amount { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 6px; }
+    .combo-amount label { color: var(--muted); font-size: 14px; font-weight: 800; }
+    .combo-amount-box { display: flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; font-size: 18px; font-weight: 900; }
+    .combo-amount-box input { width: 110px; border: 0; outline: 0; font: inherit; text-align: right; font-variant-numeric: tabular-nums; }
+    .combo-result { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0 6px; font-size: 20px; font-weight: 900; color: var(--blue); }
+    .combo-mult-pill { padding: 4px 12px; border-radius: 999px; background: #eef2ff; font-size: 16px; font-variant-numeric: tabular-nums; }
+    .combo-mult-pill:empty { display: none; }
+    .combo-disclaimer { text-align: center; color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+    .fixture-odd.combo-on { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+    .combo-toast { position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%) translateY(8px); z-index: 90; background: #18202c; color: #fff; padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .combo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">P</span>
+        <span>Polymarket</span>
+      </a>
+      <div class="top-actions">
+        <button class="ghost-btn" type="button">Markets</button>
+        <button class="primary-btn" type="button">Live</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="fixture-page" id="fixture-page">
+      <div class="home-toolbar">
+        <nav class="sports-tabs" aria-label="体育导航">
+          <button class="active" type="button" data-home-tab="games">比赛</button>
+          <button type="button" data-home-tab="props">玩法</button>
+          <button type="button" data-home-tab="map">地图</button>
+        </nav>
+        <div class="odds-fmt" id="odds-fmt">
+          <button class="odds-fmt-btn" type="button" id="odds-fmt-btn" aria-label="赔率格式" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="2.3"></circle><circle cx="16" cy="17" r="2.3"></circle><path d="M4 7h2M10.3 7H20M4 17h9.7M18.3 17H20"></path></svg>
+          </button>
+          <div class="odds-fmt-menu" id="odds-fmt-menu" role="menu" hidden></div>
+        </div>
+      </div>
+
+      <section class="home-panel" id="games-panel">
+        <a class="archive-entry" href="/wc2026.html">
+          <span class="archive-ico">🏆</span>
+          <span class="archive-txt">
+            <b>2026 世界杯回顾</b>
+            <small>冠军西班牙 · 104 场战果 · 夺冠概率赛马图</small>
+          </span>
+          <span class="archive-arrow">›</span>
+        </a>
+
+        <div class="fixture-head" aria-hidden="true">
+          <h1 class="fixture-date" id="fixture-date">--</h1>
+        </div>
+
+        <div class="fixture-list" id="fixture-list">
+          <div class="empty">正在加载比赛</div>
+        </div>
+      </section>
+
+      <section class="home-panel hidden" id="props-panel">
+        <nav class="props-tabs" id="props-tabs" aria-label="玩法分类"></nav>
+        <div class="props-list" id="props-list">
+          <div class="empty">正在加载玩法</div>
+        </div>
+      </section>
+
+      <section class="home-panel hidden" id="map-panel">
+        <div class="map-shell">
+          <section class="map-card">
+            <div class="map-card-head">
+              <div>
+                <h1 class="map-title" id="map-title">世界杯冠军地图</h1>
+                <p class="map-subtitle" id="map-subtitle">按 Polymarket 冠军盘口隐含概率着色</p>
+              </div>
+              <div class="map-updated" id="map-updated">--</div>
+            </div>
+            <div class="globe-wrap">
+              <canvas class="globe-canvas" id="world-map" width="900" height="520" aria-label="世界杯冠军概率地球"></canvas>
+              <div class="globe-label-layer" id="globe-label-layer" aria-hidden="true"></div>
+              <div class="globe-tip" id="globe-tip">正在加载地球</div>
+            </div>
+          </section>
+          <aside class="map-rank-card">
+            <div class="map-rank-head">
+              <h3>冠军概率</h3>
+              <span class="map-updated" id="map-count">--</span>
+            </div>
+            <div class="map-rank-list" id="map-rank-list">
+              <div class="empty">正在加载排名</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <div class="prop-detail-page hidden" id="prop-detail-page">
+      <a class="prop-back" href="/?tab=props">← 返回玩法</a>
+      <section class="prop-hero">
+        <div class="prop-hero-card">
+          <div class="crumbs">体育 <span>/</span> 世界杯 <span>/</span> <span id="prop-category-name">玩法</span></div>
+          <h1 id="prop-title">--</h1>
+          <p id="prop-description" hidden></p>
+        </div>
+        <aside class="prop-summary-card">
+          <div class="side-title">
+            <span>玩法摘要</span>
+            <span id="prop-state">--</span>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-row"><span>总交易量</span><strong id="prop-volume">--</strong></div>
+            <div class="stat-row"><span>盘口数量</span><strong id="prop-market-count">--</strong></div>
+            <div class="stat-row"><span>最后刷新</span><strong id="prop-refresh-time">--</strong></div>
+          </div>
+        </aside>
+      </section>
+      <section class="market-shell">
+        <div class="section-head">
+          <h2>候选项盘口</h2>
+          <span id="prop-list-count">--</span>
+        </div>
+        <div class="prop-detail-list" id="prop-detail-list">
+          <div class="empty">正在加载玩法盘口</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="detail-page hidden" id="detail-page">
+    <section class="match-hero">
+      <div class="match-card">
+        <div class="crumbs">体育 <span>/</span> 世界杯 <span>/</span> 足球</div>
+        <div class="hero-main">
+          <div class="team">
+            <div class="flag" id="home-flag" aria-hidden="true"></div>
+            <strong class="team-name" id="home-team">--</strong>
+          </div>
+          <div class="kickoff">
+            <div class="kickoff-time" id="game-time">--</div>
+            <div class="kickoff-date" id="game-date">--</div>
+          </div>
+          <div class="team away">
+            <div class="flag" id="away-flag" aria-hidden="true"></div>
+            <strong class="team-name" id="away-team">--</strong>
+          </div>
+        </div>
+        <div class="hero-meta">
+          <span class="status" id="status"><span>正在加载</span><span>--</span></span>
+          <span class="meta-pill">盘口 <strong id="market-count">--</strong></span>
+        </div>
+      </div>
+
+      <aside class="side-card">
+        <div class="side-title">
+          <span>比赛摘要</span>
+          <span id="event-state">--</span>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-row"><span>最后刷新</span><strong id="refresh-time">--</strong></div>
+          <div class="stat-row"><span>市场更新</span><strong id="market-time">--</strong></div>
+          <div class="stat-row"><span>数据源</span><strong>Polymarket</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="chart-card" aria-label="胜平负价格走势">
+      <div class="chart-top">
+        <div class="chart-volume" id="chart-volume">-- Vol.</div>
+        <div class="chart-switch" id="chart-switch">
+          <button type="button" class="switch-pill" data-chart-view="market">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 19V5m0 14h16M7 15l4-4 3 3 5-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            走势
+          </button>
+          <button type="button" class="switch-muted" data-chart-view="live">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 20V9m7 11V4m7 16v-7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+            </svg>
+            实时数据
+          </button>
+        </div>
+        <div class="chart-brand">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M6 7.5 25 3v26L6 21.5V7.5Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M6.5 8 25 16 6.5 21.5" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+          Polymarket
+        </div>
+      </div>
+      <div class="chart-body" id="chart-body">
+        <div class="chart-canvas">
+          <svg id="price-chart" viewBox="0 0 820 300" role="img" aria-label="胜平负概率走势图"></svg>
+        </div>
+      </div>
+      <div class="live-stats hidden" id="live-stats"></div>
+      <div class="range-buttons" id="chart-ranges" aria-label="走势图时间范围">
+        <button type="button" data-range="1h">1小时</button>
+        <button type="button" data-range="6h">6小时</button>
+        <button type="button" data-range="1d">1天</button>
+        <button type="button" data-range="1w">1周</button>
+        <button type="button" data-range="1m">1个月</button>
+        <button class="active" type="button" data-range="all">全部</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="market-shell">
+        <nav class="market-tabs" id="tabs" aria-label="盘口分类"></nav>
+        <div class="sections" id="sections">
+          <div class="empty">正在加载盘口</div>
+        </div>
+      </div>
+
+      <aside class="right-rail">
+        <div class="side-card">
+          <div class="side-title">
+            <span>胜平负</span>
+            <span id="moneyline-count">--</span>
+          </div>
+          <div class="moneyline" id="moneyline"></div>
+        </div>
+        <div class="side-card">
+          <div class="side-title">展示范围</div>
+          <p class="rail-note">本地页面只展示盘口名称和当前价格，不展示订单簿、挂单深度、成交记录或其他用户下注信息。</p>
+        </div>
+      </aside>
+    </section>
+
+    <footer>价格单位为美分，约等于隐含概率；本页仅作数据展示，不构成交易建议。</footer>
+    </div>
+  </main>
+
+  <div class="combo-backdrop" id="combo-backdrop" hidden></div>
+  <div class="combo-sheet" id="combo-sheet" hidden role="dialog" aria-label="组合">
+    <div class="combo-sheet-grip"></div>
+    <div class="combo-sheet-head">
+      <span class="combo-sheet-title">组合 <b id="combo-count">0</b> 个选项</span>
+      <span class="combo-beta">测试版</span>
+      <button type="button" class="combo-sheet-close" id="combo-sheet-close" aria-label="关闭">✕</button>
+    </div>
+    <div class="combo-legs" id="combo-legs"></div>
+    <div class="combo-amount">
+      <label for="combo-amount-input">投入金额</label>
+      <div class="combo-amount-box"><span>$</span><input id="combo-amount-input" type="number" inputmode="decimal" min="0" step="1" value="100"></div>
+    </div>
+    <div class="combo-result">
+      <span class="combo-payout" id="combo-payout">至少选择 2 个选项</span>
+      <span class="combo-mult-pill" id="combo-mult-pill"></span>
+    </div>
+    <div class="combo-disclaimer">理论组合赔率（假设各项独立）· 仅供参考，不可下单</div>
+  </div>
+
+  <div class="combo-bar" id="combo-bar" hidden>
+    <button type="button" class="combo-bar-main" id="combo-bar-open">
+      <span class="combo-bar-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><rect x="3" y="3" width="11" height="11" rx="2.5" fill="#7b5cff"></rect><rect x="10" y="10" width="11" height="11" rx="2.5" fill="#b29bff"></rect></svg></span>
+      <span class="combo-bar-text" id="combo-bar-text">组合</span>
+      <span class="combo-bar-mult" id="combo-bar-mult"></span>
+    </button>
+    <button type="button" class="combo-bar-clear" id="combo-bar-clear" aria-label="清空">✕</button>
+  </div>
+
+  <script src="/globe.js"></script>
+  <script>
+    const refreshMs = 15000;
+    const routeParams = new URLSearchParams(location.search);
+    const routeView = routeParams.get("view");
+    const isPropRoute = routeView === "prop";
+    const isDetailRoute = routeView === "detail" || (!routeView && Boolean(routeParams.get("slug")) && Boolean(location.hash));
+
+    const eventSlug = routeParams.get("slug") || "fifwc-fra-sen-2026-06-16";
+    const propSlug = routeParams.get("propSlug") || routeParams.get("slug") || "";
+    let latestData = null;
+    let latestChartData = null;
+    let latestPropsData = null;
+    let latestMapData = null;
+    let chartView = null;
+    let activeRange = "all";
+    let activeCategoryId = location.hash ? location.hash.slice(1) : null;
+    let activeHomeTab = ["props", "map"].includes(routeParams.get("tab")) ? routeParams.get("tab") : "games";
+    let activePropsCategory = "all";
+    const selectedVariants = new Map();
+    const selectedOutcomes = new Map(); // entry.id -> selected outcome index (visual highlight only)
+
+    let latestFixtures = [];
+    const ODDS_FORMATS = [
+      { id: "price", label: "价格" },
+      { id: "american", label: "美式" },
+      { id: "decimal", label: "小数" },
+      { id: "fractional", label: "分数" },
+      { id: "percent", label: "百分比" },
+      { id: "indonesian", label: "印尼式" },
+      { id: "hongkong", label: "香港" },
+      { id: "malay", label: "马来式" },
+    ];
+    let oddsFormat = (() => { try { return localStorage.getItem("oddsFormat") || "percent"; } catch (e) { return "percent"; } })();
+    function oddsGcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { const t = b; b = a % b; a = t; } return a || 1; }
+    function formatOdds(price) {
+      const p = Number(price);
+      if (!Number.isFinite(p) || p <= 0 || p >= 1) return "-";
+      if (oddsFormat === "percent") return `${Math.round(p * 100)}%`;
+      const q = Math.min(0.99, Math.max(0.01, p));
+      const dec = 1 / q;
+      switch (oddsFormat) {
+        case "decimal": return dec.toFixed(2);
+        case "american": return q >= 0.5 ? `${Math.round(-100 * q / (1 - q))}` : `+${Math.round(100 * (1 - q) / q)}`;
+        case "fractional": { const num = Math.round((1 - q) / q * 100); const den = 100; const g = oddsGcd(num, den); return `${num / g}/${den / g}`; }
+        case "hongkong": return (dec - 1).toFixed(2);
+        case "indonesian": return dec >= 2 ? `+${(dec - 1).toFixed(2)}` : `${(-1 / (dec - 1)).toFixed(2)}`;
+        case "malay": { const m = dec - 1; return m <= 1 ? m.toFixed(2) : `${(-1 / m).toFixed(2)}`; }
+        case "price":
+        default: { const c = p * 100; const t = c >= 10 ? c.toFixed(1) : c.toFixed(2); return `${t.replace(/\.?0+$/, "")}¢`; }
+      }
+    }
+    window.formatOdds = formatOdds;
+
+    function apiUrl(path, params = {}) {
+      const url = new URL(path, location.origin);
+      if (params.slug) {
+        url.searchParams.set("slug", params.slug);
+        delete params.slug;
+      } else if (isDetailRoute) {
+        url.searchParams.set("slug", eventSlug);
+      }
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) url.searchParams.set(key, value);
+      });
+      url.searchParams.set("t", Date.now());
+      return `${url.pathname}?${url.searchParams.toString()}`;
+    }
+
+    function syncRouteView() {
+      document.getElementById("fixture-page").classList.toggle("hidden", isDetailRoute || isPropRoute);
+      document.getElementById("detail-page").classList.toggle("hidden", !isDetailRoute);
+      document.getElementById("prop-detail-page").classList.toggle("hidden", !isPropRoute);
+    }
+
+    function showDetailLoading() {
+      document.getElementById("home-team").textContent = "--";
+      document.getElementById("away-team").textContent = "--";
+      setFlagElement("home-flag", "");
+      setFlagElement("away-flag", "");
+      document.getElementById("game-time").textContent = "--";
+      document.getElementById("refresh-time").textContent = "--";
+      document.getElementById("market-time").textContent = "--";
+      document.getElementById("market-count").textContent = "--";
+      document.getElementById("event-state").textContent = "--";
+      document.getElementById("tabs").innerHTML = "";
+      document.getElementById("sections").innerHTML = `<div class="empty">正在加载盘口</div>`;
+      document.getElementById("moneyline-count").textContent = "--";
+      document.getElementById("moneyline").innerHTML = "";
+      document.getElementById("price-chart").innerHTML = `<text x="410" y="150" text-anchor="middle" class="chart-axis">正在加载走势</text>`;
+    }
+
+    function esc(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function fmtDate(value, withSeconds = false) {
+      if (!value) return "--";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "--";
+      return new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: withSeconds ? "2-digit" : undefined,
+        hour12: false
+      }).format(date);
+    }
+
+    function pct(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "--";
+      return `${Math.round(n * 100)}%`;
+    }
+
+    function fmtAxisDate(seconds) {
+      const date = new Date(seconds * 1000);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        month: "numeric",
+        day: activeRange === "1h" || activeRange === "6h" ? undefined : "numeric",
+        hour: activeRange === "1h" || activeRange === "6h" ? "2-digit" : undefined,
+        minute: activeRange === "1h" || activeRange === "6h" ? "2-digit" : undefined,
+        hour12: false
+      }).format(date);
+    }
+
+    function fmtFocusDate(seconds) {
+      const date = new Date(seconds * 1000);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(date);
+    }
+
+    function pointsPath(points, xScale, yScale) {
+      return points.map((point, index) => {
+        const cmd = index === 0 ? "M" : "L";
+        return `${cmd}${xScale(point.t).toFixed(1)} ${yScale(point.p).toFixed(1)}`;
+      }).join(" ");
+    }
+
+    function nearestPoint(points, targetT) {
+      if (!points?.length) return null;
+      let low = 0;
+      let high = points.length - 1;
+      while (low < high) {
+        const mid = Math.floor((low + high) / 2);
+        if (points[mid].t < targetT) low = mid + 1;
+        else high = mid;
+      }
+      const next = points[low];
+      const prev = points[Math.max(0, low - 1)];
+      if (!prev) return next;
+      if (!next) return prev;
+      return Math.abs(prev.t - targetT) <= Math.abs(next.t - targetT) ? prev : next;
+    }
+
+    function selectedChartPoints(targetT) {
+      if (!chartView) return [];
+      return chartView.series
+        .map((item, index) => {
+          const point = nearestPoint(item.history || [], targetT);
+          if (!point || !Number.isFinite(point.p) || !Number.isFinite(point.t)) return null;
+          return {
+            label: item.label,
+            color: item.color,
+            index,
+            point,
+            valueText: pct(point.p),
+            x: chartView.xScale(point.t),
+            y: chartView.yScale(point.p),
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function orderedMoneylineItems(items) {
+      const list = [...(items || [])];
+      const drawIndex = list.findIndex(item => String(item.label || item.title || "").includes("平局") || /draw/i.test(String(item.label || item.title || "")));
+      if (drawIndex < 0) return list;
+      const draw = list.splice(drawIndex, 1)[0];
+      if (list.length >= 2) return [list[0], draw, list[1], ...list.slice(2)];
+      return [draw, ...list];
+    }
+
+    function updateChartFocus(targetT) {
+      if (!chartView) return;
+      const layer = document.getElementById("chart-hover-layer");
+      if (!layer) return;
+      const clampedT = Math.max(chartView.minT, Math.min(chartView.maxT, targetT));
+      const points = selectedChartPoints(clampedT);
+      if (!points.length) return;
+
+      const focusTime = points[0].point.t;
+      const focusX = chartView.xScale(focusTime);
+      const GAP = 54;
+      const topLimit = 34;
+      const bottomLimit = chartView.height - 36;
+      const sorted = points
+        .map(item => ({ ...item, labelY: item.y }))
+        .sort((a, b) => a.y - b.y);
+      for (let index = 1; index < sorted.length; index += 1) {
+        sorted[index].labelY = Math.max(sorted[index].labelY, sorted[index - 1].labelY + GAP);
+      }
+      const span = sorted.at(-1).labelY - sorted[0].labelY;
+      if (span > bottomLimit - topLimit) {
+        const n = sorted.length;
+        sorted.forEach((item, i) => { item.labelY = topLimit + (bottomLimit - topLimit) * (n === 1 ? 0.5 : i / (n - 1)); });
+      } else if (sorted[0].labelY < topLimit) {
+        const shift = topLimit - sorted[0].labelY;
+        sorted.forEach(item => { item.labelY += shift; });
+      } else if (sorted.at(-1).labelY > bottomLimit) {
+        const shift = sorted.at(-1).labelY - bottomLimit;
+        sorted.forEach(item => { item.labelY -= shift; });
+      }
+      const labelYByName = new Map(sorted.map(item => [item.label, item.labelY]));
+      const dateAnchor = Math.max(chartView.pad.left + 38, Math.min(chartView.width - chartView.pad.right - 10, focusX));
+
+      layer.innerHTML = `
+        <line class="chart-crosshair" x1="${focusX.toFixed(1)}" y1="${chartView.pad.top}" x2="${focusX.toFixed(1)}" y2="${chartView.height - chartView.pad.bottom}"></line>
+        <text class="chart-focus-date" x="${dateAnchor.toFixed(1)}" y="${Math.max(16, chartView.pad.top - 6)}" text-anchor="middle">${esc(fmtFocusDate(focusTime))}</text>
+        ${points.map(item => {
+          const ly = labelYByName.get(item.label);
+          return `
+            <circle class="chart-dot" cx="${item.x.toFixed(1)}" cy="${item.y.toFixed(1)}" r="6" fill="${esc(item.color)}"></circle>
+            <text class="chart-end-name" x="${chartView.bigLabelX}" y="${(ly - 15).toFixed(1)}" fill="${esc(item.color)}">${esc(item.label)}</text>
+            <text class="chart-end-pct" x="${chartView.bigLabelX}" y="${(ly + 20).toFixed(1)}" fill="${esc(item.color)}">${esc(item.valueText)}</text>
+          `;
+        }).join("")}
+      `;
+    }
+
+    function bindChartPointer() {
+      if (!chartView) return;
+      const svg = document.getElementById("price-chart");
+      const hitbox = document.getElementById("chart-hitbox");
+      if (!svg || !hitbox) return;
+      const pointerToTargetTime = event => {
+        const rect = svg.getBoundingClientRect();
+        const rawX = ((event.clientX - rect.left) / Math.max(1, rect.width)) * chartView.width;
+        const x = Math.max(chartView.pad.left, Math.min(chartView.width - chartView.pad.right, rawX));
+        return chartView.minT + ((x - chartView.pad.left) / chartView.plotW) * (chartView.maxT - chartView.minT);
+      };
+      const handlePointer = event => {
+        updateChartFocus(pointerToTargetTime(event));
+      };
+      hitbox.addEventListener("pointermove", handlePointer);
+      hitbox.addEventListener("pointerdown", event => {
+        hitbox.setPointerCapture?.(event.pointerId);
+        handlePointer(event);
+      });
+    }
+
+    function renderChart(data) {
+      const svg = document.getElementById("price-chart");
+      const volume = document.getElementById("chart-volume");
+      const series = data.series || [];
+      const allPoints = series.flatMap(item => item.history || []);
+      latestChartData = data;
+      volume.textContent = data.event?.volumeText || "-- Vol.";
+
+      if (!series.length || !allPoints.length) {
+        chartView = null;
+        svg.innerHTML = `<text x="410" y="150" text-anchor="middle" class="chart-axis">暂无走势数据</text>`;
+        return;
+      }
+
+      const width = 820;
+      const height = 300;
+      const pad = { left: 24, right: 262, top: 24, bottom: 30 };
+      const gridRight = width - 26;
+      const axisX = width - 8;
+      const bigLabelX = width - pad.right + 14;
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+      const minT = Math.min(...allPoints.map(point => point.t));
+      const maxT = Math.max(...allPoints.map(point => point.t));
+      const values = series.flatMap(item => [...(item.history || []).map(point => point.p), item.current].filter(value => Number.isFinite(value)));
+      const minV = Math.min(...values);
+      const maxV = Math.max(...values);
+      let yMin = 0.08;
+      let yMax = 0.75;
+      if (minV < yMin || maxV > yMax) {
+        yMin = Math.max(0, Math.floor((minV - 0.04) * 20) / 20);
+        yMax = Math.min(1, Math.ceil((maxV + 0.04) * 20) / 20);
+      }
+      if (yMax - yMin < 0.2) {
+        yMin = Math.max(0, yMin - 0.1);
+        yMax = Math.min(1, yMax + 0.1);
+      }
+
+      const xScale = value => pad.left + ((value - minT) / Math.max(1, maxT - minT)) * plotW;
+      const yScale = value => pad.top + (1 - ((value - yMin) / Math.max(0.01, yMax - yMin))) * plotH;
+      const tickCount = 5;
+      const yTicks = Array.from({ length: tickCount }, (_, index) => yMin + ((yMax - yMin) / (tickCount - 1)) * index);
+      const xTicks = [minT, minT + (maxT - minT) / 2, maxT];
+
+      const grid = yTicks.map(tick => {
+        const y = yScale(tick).toFixed(1);
+        return `
+          <line class="chart-grid" x1="${pad.left}" y1="${y}" x2="${gridRight}" y2="${y}"></line>
+          <text class="chart-axis" x="${axisX}" y="${Number(y) + 4}" text-anchor="end">${pct(tick)}</text>
+        `;
+      }).join("");
+
+      const xLabels = xTicks.map((tick, index) => {
+        const x = xScale(tick).toFixed(1);
+        return `<text class="chart-axis" x="${x}" y="${height - 8}" text-anchor="${index === 0 ? "start" : index === 2 ? "end" : "middle"}">${esc(fmtAxisDate(tick))}</text>`;
+      }).join("");
+
+      const paths = series.map(item => {
+        const points = item.history || [];
+        const path = pointsPath(points, xScale, yScale);
+        if (!points.at(-1) || !path) return "";
+        return `
+          <path class="chart-fade" d="${path}" opacity="0.34"></path>
+          <path class="chart-line" d="${path}" stroke="${esc(item.color)}"></path>
+        `;
+      }).join("");
+
+      svg.innerHTML = `
+        ${grid}
+        ${paths}
+        ${xLabels}
+        <g id="chart-hover-layer"></g>
+        <rect id="chart-hitbox" class="chart-hitbox" x="${pad.left}" y="${pad.top}" width="${plotW}" height="${plotH}"></rect>
+      `;
+      chartView = { data, series, width, height, pad, plotW, plotH, minT, maxT, yMin, yMax, xScale, yScale, bigLabelX };
+      updateChartFocus(maxT);
+      bindChartPointer();
+    }
+
+    async function loadChart(range = activeRange) {
+      activeRange = range;
+      document.querySelectorAll("#chart-ranges button").forEach(button => {
+        button.classList.toggle("active", button.dataset.range === activeRange);
+      });
+      try {
+        const response = await fetch(apiUrl("/api/chart", { interval: activeRange }), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        renderChart(data);
+      } catch (error) {
+        document.getElementById("price-chart").innerHTML = `<text x="410" y="150" text-anchor="middle" class="chart-axis">走势图加载失败：${esc(error.message)}</text>`;
+      }
+    }
+
+    function teamShort(label) {
+      const value = String(label || "");
+      if (value.includes("平局") || /draw/i.test(value)) return "DRAW";
+      if (value.includes("法国") || /france/i.test(value)) return "FRA";
+      if (value.includes("塞内加尔") || /senegal/i.test(value)) return "SEN";
+      if (value.includes("西班牙") || /spain/i.test(value)) return "ESP";
+      if (value.includes("佛得角") || /cabo|verde/i.test(value)) return "CVI";
+      if (value.includes("比利时") || /belgium/i.test(value)) return "BEL";
+      if (value.includes("埃及") || /egypt/i.test(value)) return "EGY";
+      if (value.includes("沙特") || /saudi/i.test(value)) return "KSA";
+      if (value.includes("乌拉圭") || /uruguay/i.test(value)) return "URY";
+      if (value.includes("伊朗") || /iran/i.test(value)) return "IRN";
+      if (value.includes("新西兰") || /new zealand/i.test(value)) return "NZL";
+      if (value.includes("伊拉克") || /iraq/i.test(value)) return "IRQ";
+      if (value.includes("挪威") || /norway/i.test(value)) return "NOR";
+      if (value.includes("阿根廷") || /argentina/i.test(value)) return "ARG";
+      if (value.includes("阿尔及利亚") || /algeria/i.test(value)) return "ALG";
+      if (value.includes("奥地利") || /austria/i.test(value)) return "AUT";
+      if (value.includes("约旦") || /jordan/i.test(value)) return "JOR";
+      if (value.includes("葡萄牙") || /portugal/i.test(value)) return "PRT";
+      if (value.includes("刚果民主共和国") || /dr congo|congo/i.test(value)) return "CDR";
+      if (value.includes("英格兰") || /england/i.test(value)) return "ENG";
+      if (value.includes("克罗地亚") || /croatia/i.test(value)) return "HRV";
+      if (value.includes("加纳") || /ghana/i.test(value)) return "GHA";
+      if (value.includes("巴拿马") || /panama/i.test(value)) return "PAN";
+      if (value.includes("乌兹别克") || /uzbekistan/i.test(value)) return "UZB";
+      if (value.includes("哥伦比亚") || /colombia/i.test(value)) return "COL";
+      if (value.includes("捷克") || /czech/i.test(value)) return "CZE";
+      if (value.includes("南非") || /south africa/i.test(value)) return "RSA";
+      if (value.includes("瑞士") || /switzerland/i.test(value)) return "CHE";
+      if (value.includes("波黑") || value.includes("波斯尼亚") || /bosnia/i.test(value)) return "BIH";
+      if (value.includes("加拿大") || /canada/i.test(value)) return "CAN";
+      if (value.includes("卡塔尔") || /qatar/i.test(value)) return "QAT";
+      if (value.includes("均无") || /neither/i.test(value)) return "NO GOAL";
+      return value.slice(0, 5).toUpperCase();
+    }
+
+    function marketVolume(markets) {
+      const total = markets.reduce((sum, market) => sum + Number(market.volume || 0), 0);
+      if (!Number.isFinite(total) || total <= 0) return "-- 交易量";
+      if (total >= 1000000) return `$${(total / 1000000).toFixed(1).replace(/\.0$/, "")}M 交易量`;
+      if (total >= 1000) return `$${(total / 1000).toFixed(1).replace(/\.0$/, "")}K 交易量`;
+      return `$${Math.round(total)} 交易量`;
+    }
+
+    function lineFromTitle(title) {
+      const match = String(title || "").match(/(-?\d+(?:\.\d+)?)/);
+      return match ? Number(match[1]) : null;
+    }
+
+    function absLineLabel(value) {
+      const n = Math.abs(Number(value));
+      return Number.isFinite(n) ? String(n).replace(/\.0$/, "") : "";
+    }
+
+    function signedLine(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "";
+      return `${n > 0 ? "+" : ""}${String(n).replace(/\.0$/, "")}`;
+    }
+
+    function marketYes(market) {
+      return market.outcomes.find(outcome => outcome.label.startsWith("是")) || market.outcomes[0];
+    }
+
+    function teamFromTitle(title) {
+      const value = String(title || "");
+      if (value.includes("法国")) return "法国";
+      if (value.includes("塞内加尔")) return "塞内加尔";
+      if (value.includes("西班牙")) return "西班牙";
+      if (value.includes("佛得角")) return "佛得角";
+      if (value.includes("比利时")) return "比利时";
+      if (value.includes("埃及")) return "埃及";
+      if (value.includes("沙特")) return "沙特阿拉伯";
+      if (value.includes("乌拉圭")) return "乌拉圭";
+      if (value.includes("伊朗")) return "伊朗";
+      if (value.includes("新西兰")) return "新西兰";
+      if (value.includes("伊拉克")) return "伊拉克";
+      if (value.includes("挪威")) return "挪威";
+      if (value.includes("阿根廷")) return "阿根廷";
+      if (value.includes("阿尔及利亚")) return "阿尔及利亚";
+      if (value.includes("奥地利")) return "奥地利";
+      if (value.includes("约旦")) return "约旦";
+      if (value.includes("葡萄牙")) return "葡萄牙";
+      if (value.includes("刚果民主共和国")) return "刚果民主共和国";
+      if (value.includes("英格兰")) return "英格兰";
+      if (value.includes("克罗地亚")) return "克罗地亚";
+      if (value.includes("加纳")) return "加纳";
+      if (value.includes("巴拿马")) return "巴拿马";
+      if (value.includes("乌兹别克")) return "乌兹别克斯坦";
+      if (value.includes("哥伦比亚")) return "哥伦比亚";
+      if (value.includes("捷克")) return "捷克";
+      if (value.includes("南非")) return "南非";
+      if (value.includes("瑞士")) return "瑞士";
+      if (value.includes("波黑") || value.includes("波斯尼亚")) return "波黑";
+      if (value.includes("加拿大")) return "加拿大";
+      if (value.includes("卡塔尔")) return "卡塔尔";
+      return value.split(/\s+/)[0];
+    }
+
+    function englishTeamName(team) {
+      if (String(team).includes("法国")) return "France";
+      if (String(team).includes("塞内加尔")) return "Senegal";
+      if (String(team).includes("西班牙")) return "Spain";
+      if (String(team).includes("佛得角")) return "Cabo Verde";
+      if (String(team).includes("比利时")) return "Belgium";
+      if (String(team).includes("埃及")) return "Egypt";
+      if (String(team).includes("沙特")) return "Saudi Arabia";
+      if (String(team).includes("乌拉圭")) return "Uruguay";
+      if (String(team).includes("伊朗")) return "IR Iran";
+      if (String(team).includes("新西兰")) return "New Zealand";
+      if (String(team).includes("伊拉克")) return "Iraq";
+      if (String(team).includes("挪威")) return "Norway";
+      if (String(team).includes("阿根廷")) return "Argentina";
+      if (String(team).includes("阿尔及利亚")) return "Algeria";
+      if (String(team).includes("奥地利")) return "Austria";
+      if (String(team).includes("约旦")) return "Jordan";
+      if (String(team).includes("葡萄牙")) return "Portugal";
+      if (String(team).includes("刚果民主共和国")) return "DR Congo";
+      if (String(team).includes("英格兰")) return "England";
+      if (String(team).includes("克罗地亚")) return "Croatia";
+      if (String(team).includes("加纳")) return "Ghana";
+      if (String(team).includes("巴拿马")) return "Panama";
+      if (String(team).includes("乌兹别克")) return "Uzbekistan";
+      if (String(team).includes("哥伦比亚")) return "Colombia";
+      if (String(team).includes("捷克")) return "Czechia";
+      if (String(team).includes("南非")) return "South Africa";
+      if (String(team).includes("瑞士")) return "Switzerland";
+      if (String(team).includes("波黑") || String(team).includes("波斯尼亚")) return "Bosnia and Herzegovina";
+      if (String(team).includes("加拿大")) return "Canada";
+      if (String(team).includes("卡塔尔")) return "Qatar";
+      return team;
+    }
+
+    function chineseTeamName(team) {
+      const value = String(team || "");
+      if (value.includes("France") || value.includes("法国")) return "法国";
+      if (value.includes("Senegal") || value.includes("塞内加尔")) return "塞内加尔";
+      if (value.includes("Spain") || value.includes("西班牙")) return "西班牙";
+      if (value.includes("Cabo") || value.includes("Verde") || value.includes("佛得角")) return "佛得角";
+      if (value.includes("Belgium") || value.includes("比利时")) return "比利时";
+      if (value.includes("Egypt") || value.includes("埃及")) return "埃及";
+      if (value.includes("Saudi") || value.includes("沙特")) return "沙特阿拉伯";
+      if (value.includes("Uruguay") || value.includes("乌拉圭")) return "乌拉圭";
+      if (value.includes("Iran") || value.includes("伊朗")) return "伊朗";
+      if (value.includes("New Zealand") || value.includes("新西兰")) return "新西兰";
+      if (value.includes("Iraq") || value.includes("伊拉克")) return "伊拉克";
+      if (value.includes("Norway") || value.includes("挪威")) return "挪威";
+      if (value.includes("Argentina") || value.includes("阿根廷")) return "阿根廷";
+      if (value.includes("Algeria") || value.includes("阿尔及利亚")) return "阿尔及利亚";
+      if (value.includes("Austria") || value.includes("奥地利")) return "奥地利";
+      if (value.includes("Jordan") || value.includes("约旦")) return "约旦";
+      if (value.includes("Portugal") || value.includes("葡萄牙")) return "葡萄牙";
+      if (value.includes("DR Congo") || value.includes("Congo") || value.includes("刚果民主共和国")) return "刚果民主共和国";
+      if (value.includes("England") || value.includes("英格兰")) return "英格兰";
+      if (value.includes("Croatia") || value.includes("克罗地亚")) return "克罗地亚";
+      if (value.includes("Ghana") || value.includes("加纳")) return "加纳";
+      if (value.includes("Panama") || value.includes("巴拿马")) return "巴拿马";
+      if (value.includes("Uzbekistan") || value.includes("乌兹别克")) return "乌兹别克斯坦";
+      if (value.includes("Colombia") || value.includes("哥伦比亚")) return "哥伦比亚";
+      if (value.includes("Czech") || value.includes("捷克")) return "捷克";
+      if (value.includes("South Africa") || value.includes("南非")) return "南非";
+      if (value.includes("Switzerland") || value.includes("瑞士")) return "瑞士";
+      if (value.includes("Bosnia") || value.includes("波黑") || value.includes("波斯尼亚")) return "波黑";
+      if (value.includes("Canada") || value.includes("加拿大")) return "加拿大";
+      if (value.includes("Qatar") || value.includes("卡塔尔")) return "卡塔尔";
+      return value;
+    }
+
+    function teamFlag(team) {
+      const value = String(team || "");
+      if (value.includes("法国")) return `<div class="flag flag-fr" aria-hidden="true"></div>`;
+      if (value.includes("塞内加尔")) return `<div class="flag flag-sn" aria-hidden="true"></div>`;
+      const className = [
+        [/西班牙|spain/i, "flag-es"],
+        [/佛得角|cabo|verde/i, "flag-cv"],
+        [/比利时|belgium/i, "flag-be"],
+        [/埃及|egypt/i, "flag-eg"],
+        [/沙特|saudi/i, "flag-sa"],
+        [/乌拉圭|uruguay/i, "flag-uy"],
+        [/伊朗|iran/i, "flag-ir"],
+        [/新西兰|new zealand/i, "flag-nz"],
+        [/伊拉克|iraq/i, "flag-iq"],
+        [/挪威|norway/i, "flag-no"],
+        [/阿根廷|argentina/i, "flag-ar"],
+        [/阿尔及利亚|algeria/i, "flag-dz"],
+        [/奥地利|austria/i, "flag-at"],
+        [/约旦|jordan/i, "flag-jo"],
+        [/葡萄牙|portugal/i, "flag-pt"],
+        [/刚果民主共和国|dr congo|congo/i, "flag-cd"],
+        [/英格兰|england/i, "flag-eng"],
+        [/克罗地亚|croatia/i, "flag-hr"],
+        [/加纳|ghana/i, "flag-gh"],
+        [/巴拿马|panama/i, "flag-pa"],
+        [/乌兹别克|uzbekistan/i, "flag-uz"],
+        [/哥伦比亚|colombia/i, "flag-co"],
+        [/捷克|czech/i, "flag-cz"],
+        [/南非|south africa/i, "flag-za"],
+        [/瑞士|switzerland/i, "flag-ch"],
+        [/波黑|波斯尼亚|bosnia/i, "flag-ba"],
+        [/加拿大|canada/i, "flag-ca"],
+        [/卡塔尔|qatar/i, "flag-qa"],
+      ].find(([pattern]) => pattern.test(value))?.[1] || "flag-cv";
+      return `<div class="flag ${className}" aria-hidden="true"></div>`;
+    }
+
+    function setFlagElement(elementId, team) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      element.className = "flag";
+      element.textContent = "";
+      // Prefer the real flag image (same source the home page uses); fall back to CSS flags by name.
+      const url = team && typeof team === "object" ? team.flag : "";
+      if (url) {
+        element.innerHTML = `<img src="${esc(url)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.remove()">`;
+        return;
+      }
+      const value = team && typeof team === "object" ? String(team.nameZh || team.name || "") : String(team || "");
+      if (!value) return;
+      if (value.includes("法国")) {
+        element.classList.add("flag-fr");
+        return;
+      }
+      if (value.includes("塞内加尔")) {
+        element.classList.add("flag-sn");
+        return;
+      }
+      const className = [
+        [/西班牙|spain/i, "flag-es"],
+        [/佛得角|cabo|verde/i, "flag-cv"],
+        [/比利时|belgium/i, "flag-be"],
+        [/埃及|egypt/i, "flag-eg"],
+        [/沙特|saudi/i, "flag-sa"],
+        [/乌拉圭|uruguay/i, "flag-uy"],
+        [/伊朗|iran/i, "flag-ir"],
+        [/新西兰|new zealand/i, "flag-nz"],
+        [/伊拉克|iraq/i, "flag-iq"],
+        [/挪威|norway/i, "flag-no"],
+        [/阿根廷|argentina/i, "flag-ar"],
+        [/阿尔及利亚|algeria/i, "flag-dz"],
+        [/奥地利|austria/i, "flag-at"],
+        [/约旦|jordan/i, "flag-jo"],
+        [/葡萄牙|portugal/i, "flag-pt"],
+        [/刚果民主共和国|dr congo|congo/i, "flag-cd"],
+        [/英格兰|england/i, "flag-eng"],
+        [/克罗地亚|croatia/i, "flag-hr"],
+        [/加纳|ghana/i, "flag-gh"],
+        [/巴拿马|panama/i, "flag-pa"],
+        [/乌兹别克|uzbekistan/i, "flag-uz"],
+        [/哥伦比亚|colombia/i, "flag-co"],
+        [/捷克|czech/i, "flag-cz"],
+        [/南非|south africa/i, "flag-za"],
+        [/瑞士|switzerland/i, "flag-ch"],
+        [/波黑|波斯尼亚|bosnia/i, "flag-ba"],
+        [/加拿大|canada/i, "flag-ca"],
+        [/卡塔尔|qatar/i, "flag-qa"],
+      ].find(([pattern]) => pattern.test(value))?.[1] || "flag-cv";
+      element.classList.add(className);
+    }
+
+    function playerAndThreshold(title) {
+      const value = String(title || "");
+      const parts = value.split(/[:：]/);
+      const player = parts[0]?.trim() || value;
+      const match = value.match(/(\d+)\+/);
+      return { player, threshold: match ? Number(match[1]) : 1 };
+    }
+
+    function fmtFixtureDate(value) {
+      const date = value ? new Date(value) : new Date();
+      if (Number.isNaN(date.getTime())) return "--";
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Shanghai",
+        weekday: "short",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+    }
+
+    function fmtFixtureTime(value) {
+      if (!value) return "--";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "--";
+      return new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(date);
+    }
+
+    function fixtureTextColor(hex) {
+      const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
+      if (!m) return "#fff";
+      const n = parseInt(m[1], 16);
+      const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return lum > 0.62 ? "#18202c" : "#fff";
+    }
+
+    function fixtureDarken(hex, amount) {
+      const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
+      if (!m) return "rgba(16,24,40,.28)";
+      const n = parseInt(m[1], 16);
+      const r = Math.round(((n >> 16) & 255) * (1 - amount));
+      const g = Math.round(((n >> 8) & 255) * (1 - amount));
+      const b = Math.round((n & 255) * (1 - amount));
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function fixtureFlag(team) {
+      if (team && team.flag) {
+        return `<span class="flag"><img src="${esc(team.flag)}" alt="" onerror="this.remove()"></span>`;
+      }
+      return `<span class="flag"></span>`;
+    }
+
+    function fixtureOdd(item, color, ctx) {
+      if (!item) return `<div class="fixture-empty"></div>`;
+      const on = ctx && comboHas(`${ctx.slug}|moneyline`, item.side) ? " combo-on" : "";
+      const data = ctx ? ` data-slug="${esc(ctx.slug)}" data-side="${esc(item.side)}" data-label="${esc(item.label)}" data-price="${esc(String(item.price))}" data-match="${esc(ctx.matchTitle)}" data-flag="${esc(ctx.flag || "")}"` : "";
+      if (item.side === "draw" || !color) {
+        return `<div class="fixture-odd tone-draw${on}"${data}><b>${esc(item.label)}</b><strong>${esc(formatOdds(item.price))}</strong></div>`;
+      }
+      const style = `--team-bg:${esc(color)};--team-border:${esc(fixtureDarken(color, 0.12))};--team-shadow:${esc(fixtureDarken(color, 0.4))};--team-fg:${esc(fixtureTextColor(color))}`;
+      return `<div class="fixture-odd team-tone${on}" style="${style}"${data}><b>${esc(item.label)}</b><strong>${esc(formatOdds(item.price))}</strong></div>`;
+    }
+
+    function renderFixtureCard(fx) {
+      const ml = fx.moneyline || [];
+      const home = ml.find(m => m.side === "home");
+      const draw = ml.find(m => m.side === "draw");
+      const away = ml.find(m => m.side === "away");
+      const homeName = (fx.home && (fx.home.nameZh || fx.home.name)) || "";
+      const awayName = (fx.away && (fx.away.nameZh || fx.away.name)) || "";
+      const matchTitle = `${homeName} vs ${awayName}`;
+      const ctx = (flag) => ({ slug: fx.slug, matchTitle, flag: flag || "" });
+      return `
+        <a class="fixture-card" href="?view=detail&slug=${encodeURIComponent(fx.slug)}#game-lines">
+          <div class="fixture-main">
+            <div class="fixture-meta">
+              <span class="fixture-time">${esc(fmtFixtureTime(fx.kickoff))}</span>
+              ${fx.league ? `<span class="fixture-league">${esc(fx.league)}</span>` : ""}
+              <span>${esc(fx.volumeText || "")}</span>
+            </div>
+            <div class="fixture-teams">
+              <div class="fixture-team">${fixtureFlag(fx.home)}<span>${esc(homeName)}</span><span class="fixture-record">${esc((fx.home && fx.home.record) || "")}</span></div>
+              <div class="fixture-team">${fixtureFlag(fx.away)}<span>${esc(awayName)}</span><span class="fixture-record">${esc((fx.away && fx.away.record) || "")}</span></div>
+            </div>
+          </div>
+          <div class="fixture-column">
+            ${fixtureOdd(home, fx.home && fx.home.color, ctx(fx.home && fx.home.flag))}
+            ${fixtureOdd(draw, null, ctx(""))}
+            ${fixtureOdd(away, fx.away && fx.away.color, ctx(fx.away && fx.away.flag))}
+          </div>
+        </a>`;
+    }
+
+    function isFixtureCompleted(fx) {
+      if (fx.closed) return true;
+      const t = new Date(fx.kickoff).getTime();
+      if (!Number.isFinite(t)) return false;
+      return Date.now() > t + 3 * 60 * 60 * 1000;
+    }
+
+    // Align the small flags to the team-name glyph regardless of the device's CJK font.
+    // CJK fonts vary wildly in line-box leading (e.g. Noto Sans CJK on Android), so a fixed
+    // px/em nudge can't work. Measure the actual rendered font and compute the exact offset
+    // between the line-box center (where align-items:center puts the flag) and the glyph ink center.
+    function alignFlags() {
+      try {
+        const team = document.querySelector("#fixture-list .fixture-team");
+        if (!team) return;
+        const name = team.querySelector("span:not(.flag):not(.fixture-record)");
+        if (!name) return;
+        const cs = getComputedStyle(name);
+        const fontPx = parseFloat(cs.fontSize) || 16;
+        // Measure the glyph ink center by drawing and scanning pixels — works in every browser
+        // (no reliance on actualBoundingBox metrics, which some browsers don't expose).
+        const S = Math.ceil(fontPx * 3);
+        const cv = (alignFlags._cv = alignFlags._cv || document.createElement("canvas"));
+        cv.width = S; cv.height = S;
+        const ctx = cv.getContext("2d");
+        ctx.clearRect(0, 0, S, S);
+        ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = "#000";
+        const drawBaseline = Math.round(fontPx * 1.9);
+        ctx.fillText("国", 2, drawBaseline);
+        const dat = ctx.getImageData(0, 0, S, S).data;
+        let inkTop = -1, inkBot = -1;
+        for (let y = 0; y < S; y++) {
+          let on = false;
+          for (let x = 0; x < S; x++) { if (dat[(y * S + x) * 4 + 3] > 24) { on = true; break; } }
+          if (on) { if (inkTop < 0) inkTop = y; inkBot = y; }
+        }
+        if (inkTop < 0) return; // glyph didn't render
+        const inkAboveBaseline = drawBaseline - (inkTop + inkBot) / 2;
+        // Real DOM baseline of the rendered text — captures the actual line box on THIS device/font,
+        // including any line-gap that the font's nominal metrics don't expose.
+        const probe = document.createElement("span");
+        probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline;";
+        name.appendChild(probe);
+        const baselineY = probe.getBoundingClientRect().top;
+        name.removeChild(probe);
+        const r = name.getBoundingClientRect();
+        const nudge = (baselineY - inkAboveBaseline) - (r.top + r.height / 2); // + => flag down, - => up
+        document.documentElement.style.setProperty("--flag-nudge", `${nudge.toFixed(2)}px`);
+      } catch (e) {}
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignFlags);
+    window.addEventListener("resize", alignFlags);
+
+    function renderFixtures(fixtures) {
+      const sorted = [...(fixtures || [])]
+        .filter(fx => !isFixtureCompleted(fx))
+        .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+      document.getElementById("fixture-date").textContent = sorted[0] ? fmtFixtureDate(sorted[0].kickoff) : "--";
+      document.getElementById("fixture-list").innerHTML = sorted.length
+        ? sorted.map(renderFixtureCard).join("")
+        : `<div class="empty">暂无即将开始的比赛</div>`;
+      applySearch();
+      comboRender();
+      alignFlags();
+    }
+
+    function renderPropsTabs(categories = []) {
+      const tabs = document.getElementById("props-tabs");
+      tabs.innerHTML = categories.map(category => `
+        <button type="button" class="${category.id === activePropsCategory ? "active" : ""}" data-props-category="${esc(category.id)}">${esc(category.label)}</button>
+      `).join("");
+    }
+
+    function propOdd(outcome, index) {
+      if (!outcome) return `<div class="prop-odd"><span>--</span><strong>-</strong></div>`;
+      const hot = index === 0 ? " hot" : "";
+      return `
+        <div class="prop-odd${hot}">
+          <span>${esc(outcome.label)}</span>
+          <strong>${esc(formatOdds(outcome.price))}</strong>
+        </div>
+      `;
+    }
+
+    function propPercent(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "--";
+      return `${Math.round(n * 100)}%`;
+    }
+
+    function propThemeIcon(event) {
+      if (event?.image) return `<img src="${esc(event.image)}" alt="">`;
+      const title = String(event?.title || "");
+      if (/大洲|洲际|continent/i.test(title)) return "🌐";
+      if (/特朗普|Trump/i.test(title)) return "🇺🇸";
+      if (/纪录|record/i.test(title)) return "📊";
+      if (/文化|表演|halftime|perform/i.test(title)) return "🎤";
+      if (/奖|靴|球|award|boot|ball/i.test(title)) return "🏆";
+      return "⚽";
+    }
+
+    function renderPropPick(outcome) {
+      if (!outcome) {
+        return `
+          <div class="prop-pick-row">
+            <span class="prop-pick-name">--</span>
+            <strong class="prop-pick-percent">--</strong>
+            <span class="prop-pick-actions"><span class="prop-action-btn prop-yes-btn">Yes</span><span class="prop-action-btn prop-no-btn">No</span></span>
+          </div>
+        `;
+      }
+      return `
+        <div class="prop-pick-row">
+          <span class="prop-pick-name">${esc(outcome.label)}</span>
+          <strong class="prop-pick-percent">${esc(formatOdds(outcome.price))}</strong>
+          <span class="prop-pick-actions">
+            <span class="prop-action-btn prop-yes-btn">Yes</span>
+            <span class="prop-action-btn prop-no-btn">No</span>
+          </span>
+        </div>
+      `;
+    }
+
+    function propCardTools() {
+      return `
+        <span class="prop-card-tools" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 1 1 2.2-3.7C10.5 4.6 12 7 12 7Z"/><path d="M12 7h4.5a2.5 2.5 0 1 0-2.2-3.7C13.5 4.6 12 7 12 7Z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>
+        </span>
+      `;
+    }
+
+    function renderPropCard(event) {
+      const outcomes = [...(event.outcomes || [])];
+      while (outcomes.length < 2) outcomes.push(null);
+      const text = [event.title, event.category?.label, ...(event.tags || []).map(tag => tag.label), ...(event.outcomes || []).map(item => item.label)].join(" ").toLowerCase();
+      return `
+        <a class="prop-card" href="?view=prop&propSlug=${encodeURIComponent(event.slug)}" data-props-text="${esc(text)}">
+          <div class="prop-card-header">
+            <span class="prop-card-icon" aria-hidden="true">${propThemeIcon(event)}</span>
+            <div class="prop-card-title">${esc(event.title)}</div>
+          </div>
+          <div class="prop-card-picks">${outcomes.slice(0, 2).map(renderPropPick).join("")}</div>
+          <div class="prop-card-footer">
+            <span>${esc(event.volumeText)}</span>
+            ${propCardTools()}
+          </div>
+        </a>
+      `;
+    }
+
+    function renderPropMarket(market) {
+      const outcomes = [...(market.outcomes || [])];
+      while (outcomes.length < 2) outcomes.push({ label: "--", priceText: "-" });
+      const text = [market.title, market.question, ...outcomes.map(outcome => `${outcome.label} ${outcome.priceText}`)].join(" ").toLowerCase();
+      return `
+        <article class="prop-market-row" data-prop-market-text="${esc(text)}">
+          <div>
+            <h3 class="prop-market-title">${esc(market.title)}</h3>
+            <p class="prop-market-question">${esc(market.question)}</p>
+            <div class="prop-meta">
+              <span>${esc(market.volumeText)}</span>
+            </div>
+          </div>
+          <div class="prop-market-actions">
+            ${outcomes.slice(0, 2).map((outcome, index) => propOdd(outcome, index)).join("")}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderPropDetail(data) {
+      document.title = `${data.event.title} | 世界杯玩法`;
+      document.getElementById("prop-category-name").textContent = data.event.category?.label || "玩法";
+      document.getElementById("prop-title").textContent = data.event.title;
+      document.getElementById("prop-description").textContent = "";
+      document.getElementById("prop-state").textContent = data.event.closed ? "已结束" : "开放";
+      document.getElementById("prop-volume").textContent = data.event.volumeText;
+      document.getElementById("prop-market-count").textContent = `${data.event.marketsCount} 个`;
+      document.getElementById("prop-refresh-time").textContent = fmtDate(data.snapshotAt, true);
+      document.getElementById("prop-list-count").textContent = `${data.markets.length} 个盘口`;
+      document.getElementById("prop-detail-list").innerHTML = data.markets.length
+        ? data.markets.map(renderPropMarket).join("")
+        : `<div class="empty">暂无可展示盘口</div>`;
+      applySearch();
+    }
+
+    function renderProps(data) {
+      latestPropsData = data;
+      renderPropsTabs(data.categories || []);
+      const list = document.getElementById("props-list");
+      if (!data.events?.length) {
+        list.innerHTML = `<div class="empty">这个分类暂无玩法</div>`;
+        return;
+      }
+      list.innerHTML = data.events.map(renderPropCard).join("");
+      applySearch();
+    }
+
+    const NAME_TO_GEO = {
+      "法国": "France", "西班牙": "Spain", "葡萄牙": "Portugal", "英格兰": "United Kingdom", "苏格兰": "United Kingdom",
+      "威尔士": "United Kingdom", "阿根廷": "Argentina", "巴西": "Brazil", "德国": "Germany", "荷兰": "Netherlands",
+      "挪威": "Norway", "摩洛哥": "Morocco", "美国": "United States of America", "日本": "Japan", "比利时": "Belgium",
+      "哥伦比亚": "Colombia", "墨西哥": "Mexico", "瑞士": "Switzerland", "克罗地亚": "Croatia", "乌拉圭": "Uruguay",
+      "塞内加尔": "Senegal", "科特迪瓦": "Côte d'Ivoire", "瑞典": "Sweden", "土耳其": "Turkey", "厄瓜多尔": "Ecuador",
+      "奥地利": "Austria", "韩国": "South Korea", "澳大利亚": "Australia", "加拿大": "Canada", "埃及": "Egypt",
+      "加纳": "Ghana", "阿尔及利亚": "Algeria", "波黑": "Bosnia and Herz.", "巴拉圭": "Paraguay",
+      "刚果（金）": "Dem. Rep. Congo", "刚果民主共和国": "Dem. Rep. Congo", "捷克": "Czechia", "新西兰": "New Zealand",
+      "海地": "Haiti", "约旦": "Jordan", "伊朗": "Iran", "突尼斯": "Tunisia", "乌兹别克斯坦": "Uzbekistan",
+      "巴拿马": "Panama", "伊拉克": "Iraq", "南非": "South Africa", "卡塔尔": "Qatar", "沙特阿拉伯": "Saudi Arabia",
+      "意大利": "Italy", "尼日利亚": "Nigeria", "喀麦隆": "Cameroon", "波兰": "Poland", "丹麦": "Denmark",
+      "塞尔维亚": "Serbia", "哥斯达黎加": "Costa Rica", "巴拉那": "Panama"
+    };
+    const EN2CN = { "South Korea": "韩国", "Paraguay": "巴拉圭" };
+
+    function cleanTeamName(raw) {
+      let s = String(raw || "").trim();
+      const i = s.lastIndexOf("：");
+      if (i >= 0) s = s.slice(i + 1).trim();
+      return EN2CN[s] || s;
+    }
+
+    function mapMarketPrice(market) {
+      return market?.outcomes?.find(o => o.label === "YES" || o.label === "是的")?.price ?? market?.outcomes?.[0]?.price ?? 0;
+    }
+
+    function mapPercent(price) {
+      const n = Number(price);
+      if (!Number.isFinite(n)) return "--";
+      if (n > 0 && n < 0.01) return "<1%";
+      return `${Math.round(n * 100)}%`;
+    }
+
+    function normalizeTeams(data) {
+      return (data.markets || [])
+        .filter(m => m && m.title)
+        .map(m => {
+          const cn = cleanTeamName(m.title);
+          return {
+            cnName: cn,
+            prob: mapMarketPrice(m),
+            flagImg: m.image || null,
+            geoName: NAME_TO_GEO[cn] || null,
+            slug: (data.event && data.event.slug) || "world-cup-winner",
+          };
+        })
+        .sort((a, b) => b.prob - a.prob);
+    }
+
+    let worldGlobe = null;
+    function ensureGlobe() {
+      if (worldGlobe || !window.createWorldGlobe) return worldGlobe;
+      const canvas = document.getElementById("world-map");
+      if (!canvas) return null;
+      worldGlobe = window.createWorldGlobe(canvas, {
+        geoUrl: "/geo/countries-110m.json",
+        labelLayer: document.getElementById("globe-label-layer"),
+        onReady: () => {
+          document.getElementById("globe-tip").textContent = "可拖拽旋转 · 点击国家看概率";
+          if (latestMapData) worldGlobe.update(normalizeTeams(latestMapData));
+        },
+        onError: () => {
+          document.getElementById("globe-tip").textContent = "地球暂不可用，已显示排行榜";
+        },
+        onCountrySelect: (team) => highlightRank(team ? team.geoName : null),
+      });
+      return worldGlobe;
+    }
+
+    function rankPillClass(prob) {
+      const n = Number(prob) || 0;
+      if (n >= 0.12) return "p-hi";
+      if (n >= 0.06) return "p-mid";
+      return "p-lo";
+    }
+
+    function rankFlag(team) {
+      if (team.flagImg) {
+        return `<span class="rank-flag"><img src="${esc(team.flagImg)}" alt="" onerror="this.remove()"></span>`;
+      }
+      return `<span class="rank-flag"></span>`;
+    }
+
+    function renderMapRank(teams) {
+      const list = document.getElementById("map-rank-list");
+      if (!teams.length) {
+        list.innerHTML = `<div class="empty">暂无排名</div>`;
+        return;
+      }
+      const max = teams.reduce((m, t) => Math.max(m, t.prob || 0), 0) || 1;
+      list.innerHTML = teams.map(t => {
+        const w = Math.max(4, Math.round((t.prob / max) * 100));
+        return `
+          <a class="rank-row" href="?view=prop&propSlug=${encodeURIComponent(t.slug)}" data-geo="${esc(t.geoName || "")}">
+            ${rankFlag(t)}
+            <span class="rank-main">
+              <span class="rank-name">${esc(t.cnName)}</span>
+              <span class="rank-bar"><span style="width:${w}%"></span></span>
+            </span>
+            <span class="rank-pill ${rankPillClass(t.prob)}">${mapPercent(t.prob)}</span>
+          </a>`;
+      }).join("");
+    }
+
+    function highlightRank(geoName) {
+      document.querySelectorAll("#map-rank-list .rank-row").forEach(row => {
+        const on = geoName && row.dataset.geo === geoName;
+        row.classList.toggle("active", !!on);
+        if (on) row.scrollIntoView({ block: "nearest" });
+      });
+    }
+
+    function renderMap(data) {
+      latestMapData = data;
+      const teams = normalizeTeams(data);
+      document.getElementById("map-title").textContent = (data.event && data.event.title) || "世界杯冠军地图";
+      document.getElementById("map-subtitle").textContent = `${(data.event && data.event.volumeText) || ""} · 各队夺冠隐含概率`;
+      document.getElementById("map-updated").textContent = fmtDate(data.snapshotAt, true);
+      document.getElementById("map-count").textContent = `${teams.length} 队`;
+      renderMapRank(teams);
+      const g = ensureGlobe();
+      if (g) {
+        g.setActive(activeHomeTab === "map");
+        g.update(teams);
+      }
+      if (!teams.length) document.getElementById("globe-tip").textContent = "暂无地图数据";
+    }
+
+    document.getElementById("map-rank-list").addEventListener("mouseover", (event) => {
+      if (!worldGlobe || !window.matchMedia || !matchMedia("(hover: hover)").matches) return;
+      const row = event.target.closest(".rank-row");
+      if (row && row.dataset.geo) worldGlobe.selectCountry(row.dataset.geo);
+    });
+
+    function setHomeTab(tab) {
+      activeHomeTab = tab;
+      document.getElementById("games-panel").classList.toggle("hidden", tab !== "games");
+      document.getElementById("props-panel").classList.toggle("hidden", tab !== "props");
+      document.getElementById("map-panel").classList.toggle("hidden", tab !== "map");
+      if (tab === "map") {
+        ensureGlobe();
+        if (worldGlobe) worldGlobe.setActive(true);
+        if (latestMapData) renderMap(latestMapData);
+      } else if (worldGlobe) {
+        worldGlobe.setActive(false);
+      }
+      document.querySelectorAll(".sports-tabs button[data-home-tab]").forEach(button => {
+        button.classList.toggle("active", button.dataset.homeTab === tab);
+      });
+      if (typeof comboRender === "function") comboRender();
+    }
+
+    // ===== Combo (parlay) calculator — display-only, cross-match, games tab =====
+    const COMBO_MAX = 8;
+    let comboLegs = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem("comboLegs") || "[]");
+      // migrate legacy legs (keyed by slug, moneyline-only) to the {group, oid} model
+      if (Array.isArray(saved)) comboLegs = saved.filter(Boolean).map(l => l.group ? l : { ...l, group: "moneyline", oid: l.oid != null ? l.oid : l.side, marketLabel: l.marketLabel || "胜平负" });
+    } catch (e) {}
+
+    function comboSave() { try { localStorage.setItem("comboLegs", JSON.stringify(comboLegs)); } catch (e) {} }
+    function comboKey(l) { return `${l.slug}|${l.group}`; }
+    function comboLegByKey(key) { return comboLegs.find(l => comboKey(l) === key); }
+    function comboHas(key, oid) { const l = comboLegByKey(key); return !!l && String(l.oid) === String(oid); }
+    function comboMatchTitle() {
+      const e = (latestData && latestData.event) || {};
+      const h = (e.home && (e.home.nameZh || e.home.name)) || (e.teams && e.teams.home) || "";
+      const a = (e.away && (e.away.nameZh || e.away.name)) || (e.teams && e.teams.away) || "";
+      return h && a ? `${h} vs ${a}` : (e.title || "");
+    }
+    function comboLegEff(l) { const p = Math.max(0.001, Math.min(0.999, Number(l.price) || 0)); return l.pick === "no" ? (1 - p) : p; }
+    function comboMult() { const c = comboLegs.reduce((a, l) => a * comboLegEff(l), 1); return c > 0 ? 1 / c : 0; }
+
+    function comboToast(msg) {
+      let t = document.getElementById("combo-toast");
+      if (!t) { t = document.createElement("div"); t.id = "combo-toast"; t.className = "combo-toast"; document.body.appendChild(t); }
+      t.textContent = msg; t.classList.add("show");
+      clearTimeout(comboToast._t); comboToast._t = setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
+    function comboToggle(leg) {
+      const key = comboKey(leg);
+      const i = comboLegs.findIndex(l => comboKey(l) === key);
+      if (i >= 0) {
+        if (String(comboLegs[i].oid) === String(leg.oid)) comboLegs.splice(i, 1);
+        else comboLegs[i] = { ...leg, pick: "yes" };
+      } else {
+        if (comboLegs.length >= COMBO_MAX) { comboToast(`最多 ${COMBO_MAX} 个选项`); return; }
+        comboLegs.push({ ...leg, pick: "yes" });
+      }
+      comboSave(); comboRender();
+    }
+    function comboRemove(key) { const i = comboLegs.findIndex(l => comboKey(l) === key); if (i >= 0) { comboLegs.splice(i, 1); comboSave(); comboRender(); } }
+    function comboSetPick(key, pick) { const l = comboLegByKey(key); if (l) { l.pick = pick; comboSave(); comboRender(); } }
+    function comboClear() { comboLegs = []; comboSave(); comboCloseSheet(); comboRender(); }
+
+    function comboVisible() {
+      if (typeof isPropRoute !== "undefined" && isPropRoute) return false;       // 玩法详情：无
+      if (typeof isDetailRoute !== "undefined" && isDetailRoute) return true;     // 比赛详情：显示
+      return (typeof activeHomeTab === "undefined" || activeHomeTab === "games"); // 首页只在「比赛」tab
+    }
+
+    function comboRender() {
+      document.querySelectorAll("#fixture-list .fixture-odd[data-slug]").forEach(cell => {
+        cell.classList.toggle("combo-on", comboHas(`${cell.dataset.slug}|moneyline`, cell.dataset.side));
+      });
+      document.querySelectorAll("#sections .outcome[data-combo]").forEach(cell => {
+        const on = comboHas(`${cell.dataset.slug}|${cell.dataset.group}`, cell.dataset.oid);
+        cell.classList.toggle("selected", on);
+        const col = cell.dataset.color;
+        if (on && col) { cell.style.setProperty("--sel-bg", col); cell.style.setProperty("--sel-fg", fixtureTextColor(col)); cell.style.setProperty("--sel-shadow", fixtureDarken(col, 0.28)); }
+        else if (!on) { cell.style.removeProperty("--sel-bg"); cell.style.removeProperty("--sel-fg"); cell.style.removeProperty("--sel-shadow"); }
+      });
+      const bar = document.getElementById("combo-bar");
+      if (!bar) return;
+      const n = comboLegs.length;
+      if (n === 0 || !comboVisible()) {
+        bar.hidden = true;
+        if (n === 0) comboCloseSheet();
+      } else {
+        bar.hidden = false;
+        document.getElementById("combo-bar-text").textContent = n < 2 ? "再选 1 个选项来创建组合" : `组合 ${n} 个选项`;
+        document.getElementById("combo-bar-mult").textContent = n >= 2 ? `${comboMult().toFixed(2)}x` : "";
+      }
+      document.body.classList.toggle("combo-bar-on", !bar.hidden);
+      comboRenderSheet();
+    }
+
+    function comboRenderSheet() {
+      const legsEl = document.getElementById("combo-legs");
+      if (!legsEl) return;
+      const cnt = document.getElementById("combo-count");
+      if (cnt) cnt.textContent = comboLegs.length;
+      legsEl.innerHTML = comboLegs.map(l => {
+        const key = comboKey(l);
+        const icon = l.flag ? `<span class="combo-flag"><img src="${esc(l.flag)}" alt="" onerror="this.remove()"></span>` : `<span class="combo-flag combo-flag-draw">${l.oid === "draw" ? "=" : "•"}</span>`;
+        return `
+        <div class="combo-leg">
+          <div class="combo-leg-info">
+            <div class="combo-leg-match">${esc(l.matchTitle)}${l.marketLabel ? ` · ${esc(l.marketLabel)}` : ""}</div>
+            <div class="combo-leg-pick">${icon}<span>${esc(l.label)}</span><em>${esc(formatOdds(l.price))}</em></div>
+          </div>
+          <div class="combo-toggle">
+            <button type="button" data-pick="yes" data-key="${esc(key)}" class="${l.pick !== "no" ? "on" : ""}">是</button>
+            <button type="button" data-pick="no" data-key="${esc(key)}" class="${l.pick === "no" ? "on" : ""}">否</button>
+          </div>
+          <button type="button" class="combo-leg-remove" data-remove="${esc(key)}" aria-label="移除">−</button>
+        </div>`;
+      }).join("");
+      comboUpdateResult();
+    }
+
+    function comboUpdateResult() {
+      const input = document.getElementById("combo-amount-input");
+      const amt = Math.max(0, Number(input && input.value) || 0);
+      const mult = comboMult();
+      const payoutEl = document.getElementById("combo-payout");
+      const pillEl = document.getElementById("combo-mult-pill");
+      const enough = comboLegs.length >= 2;
+      if (payoutEl) payoutEl.textContent = enough ? `$${amt.toLocaleString()} → $${(amt * mult).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "至少选择 2 个选项";
+      if (pillEl) pillEl.textContent = enough ? `${mult.toFixed(2)}x` : "";
+    }
+
+    function comboOpenSheet() {
+      if (!comboLegs.length) return;
+      document.getElementById("combo-sheet").hidden = false;
+      document.getElementById("combo-backdrop").hidden = false;
+      comboRenderSheet();
+    }
+    function comboCloseSheet() {
+      const s = document.getElementById("combo-sheet"); if (s) s.hidden = true;
+      const b = document.getElementById("combo-backdrop"); if (b) b.hidden = true;
+    }
+
+    function comboInit() {
+      const list = document.getElementById("fixture-list");
+      if (list) list.addEventListener("click", event => {
+        const cell = event.target.closest(".fixture-odd[data-slug]");
+        if (!cell) return;
+        event.preventDefault();
+        comboToggle({ slug: cell.dataset.slug, group: "moneyline", oid: cell.dataset.side, matchTitle: cell.dataset.match, marketLabel: "胜平负", label: cell.dataset.label, price: Number(cell.dataset.price), flag: cell.dataset.flag || "" });
+      });
+      const on = (id, ev, fn) => { const el = document.getElementById(id); if (el) el.addEventListener(ev, fn); };
+      on("combo-bar-open", "click", comboOpenSheet);
+      on("combo-bar-clear", "click", event => { event.stopPropagation(); comboClear(); });
+      on("combo-sheet-close", "click", comboCloseSheet);
+      on("combo-backdrop", "click", comboCloseSheet);
+      on("combo-amount-input", "input", comboUpdateResult);
+      const legsEl = document.getElementById("combo-legs");
+      if (legsEl) legsEl.addEventListener("click", event => {
+        const pick = event.target.closest("button[data-pick]");
+        if (pick) { comboSetPick(pick.dataset.key, pick.dataset.pick); return; }
+        const rm = event.target.closest("button[data-remove]");
+        if (rm) comboRemove(rm.dataset.remove);
+      });
+      comboRender();
+    }
+
+    function makeEntry(id, title, periodLabel, markets, outcomes, options = {}) {
+      return {
+        id,
+        title,
+        periodLabel: periodLabel || markets[0]?.periodLabel || "常规时间",
+        volumeText: options.volumeText || marketVolume(markets),
+        markets,
+        outcomes,
+        variants: options.variants || null,
+        searchText: [title, periodLabel, ...markets.map(m => `${m.title} ${m.question} ${m.typeLabel}`)].join(" ").toLowerCase(),
+      };
+    }
+
+    function variantDefaultIndex(variants) {
+      if (!variants?.length) return 0;
+      const hasPrice = (variant) => (variant.outcomes || []).some(o => Number.isFinite(Number(o && o.price)));
+      const preferred = variants.findIndex(variant => variant.preferred && hasPrice(variant));
+      if (preferred >= 0) return preferred;
+      let best = 0;
+      let bestScore = -Infinity;
+      variants.forEach((variant, index) => {
+        const volumeScore = Number(variant.volume || 0) / 1000;
+        const balanceScore = -Math.abs((variant.outcomes?.[0]?.price || 0.5) - 0.5) * 20;
+        const score = (hasPrice(variant) ? 0 : -1e6) + volumeScore + balanceScore;
+        if (score > bestScore) {
+          best = index;
+          bestScore = score;
+        }
+      });
+      return best;
+    }
+
+    function getSelectedVariant(entry) {
+      const fallback = variantDefaultIndex(entry.variants);
+      const index = selectedVariants.has(entry.id) ? selectedVariants.get(entry.id) : fallback;
+      return Math.max(0, Math.min(entry.variants.length - 1, index));
+    }
+
+    function makeSelectorEntry(id, title, periodLabel, markets, variants) {
+      const selected = variants[variantDefaultIndex(variants)] || variants[0];
+      return makeEntry(id, title, periodLabel, markets, selected?.outcomes || [], { variants });
+    }
+
+    // Team color for a result-market option title (胜平负-style). Draw / no match -> null.
+    function teamColorForTitle(title) {
+      const e = (latestData && latestData.event) || {};
+      const home = e.home || {}, away = e.away || {};
+      const t = String(title || "");
+      if (/平局|draw/i.test(t)) return null;
+      const hit = (team) => team && (
+        (team.nameZh && t.includes(team.nameZh)) ||
+        (team.abbr && t.toUpperCase().includes(team.abbr)) ||
+        (team.name && new RegExp(team.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(t))
+      );
+      if (hit(home)) return home.color || null;
+      if (hit(away)) return away.color || null;
+      return null;
+    }
+
+    // Classify a result-market option title to home / away / draw (for combo identity).
+    function teamSideForTitle(title) {
+      const e = (latestData && latestData.event) || {};
+      const t = String(title || "");
+      if (/平局|draw/i.test(t)) return "draw";
+      const hit = (team) => team && (
+        (team.nameZh && t.includes(team.nameZh)) ||
+        (team.abbr && t.toUpperCase().includes(team.abbr)) ||
+        (team.name && new RegExp(team.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(t))
+      );
+      if (hit(e.home)) return "home";
+      if (hit(e.away)) return "away";
+      return "";
+    }
+
+    function yesOutcomes(markets) {
+      return markets.map(market => {
+        const yes = marketYes(market);
+        const isDraw = teamShort(market.title) === "DRAW";
+        return { label: isDraw ? "平局" : teamShort(market.title), price: yes?.price, priceText: yes?.priceText || "-", tone: teamShort(market.title) === "FRA" ? "blue" : teamShort(market.title) === "SEN" ? "green" : "", color: isDraw ? null : teamColorForTitle(market.title), side: isDraw ? "draw" : teamSideForTitle(market.title) };
+      });
+    }
+
+    function spreadVariant(market) {
+      const team = teamFromTitle(market.title);
+      const negative = lineFromTitle(market.title) ?? 0;
+      const abs = Math.abs(negative);
+      return {
+        selectorLabel: absLineLabel(abs),
+        team: teamShort(team),
+        abs,
+        volume: market.volume,
+        outcomes: market.outcomes.map(outcome => {
+          const isFav = outcome.label === team;
+          const line = isFav ? negative : -negative;
+          const code = teamShort(outcome.label);
+          return {
+            label: `${code} ${signedLine(line)}`,
+            price: outcome.price,
+            priceText: outcome.priceText,
+            tone: code === "FRA" ? "blue" : code === "SEN" ? "green" : "",
+          };
+        }),
+      };
+    }
+
+    function overUnderVariant(market, prefix = "") {
+      const line = lineFromTitle(market.title);
+      const label = absLineLabel(line);
+      return {
+        selectorLabel: label,
+        volume: market.volume,
+        outcomes: market.outcomes.map(outcome => ({
+          label: `${outcome.label} ${label}`,
+          price: outcome.price,
+          priceText: outcome.priceText,
+        })),
+        searchText: `${prefix} ${label}`,
+      };
+    }
+
+    function playerVariants(markets) {
+      const variants = markets.map(market => {
+        const parsed = playerAndThreshold(market.title);
+        const line = (parsed.threshold - 0.5).toString(); // 1+ -> 0.5, 2+ -> 1.5 (over/under line)
+        const yes = marketYes(market);
+        const no = market.outcomes.find(outcome => outcome.label === "不") || market.outcomes[1];
+        return {
+          selectorLabel: line,
+          volume: market.volume,
+          outcomes: [
+            { label: `大 ${line}`, price: yes?.price, priceText: yes?.priceText || "-" },
+            { label: `小 ${line}`, price: no?.price, priceText: no?.priceText || "-" },
+          ],
+        };
+      }).sort((a, b) => Number(a.selectorLabel) - Number(b.selectorLabel));
+      if (variants[0]) variants[0].preferred = true;
+      return variants;
+    }
+
+    function groupBy(items, keyFn) {
+      const map = new Map();
+      items.forEach(item => {
+        const key = keyFn(item);
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(item);
+      });
+      return map;
+    }
+
+    function makeBttsEntry(id, title, market) {
+      return makeEntry(id, title, "常规时间", [market], market.outcomes.map(outcome => ({
+        ...outcome,
+        label: outcome.label === "是的" ? "是" : outcome.label === "不" ? "否" : outcome.label,
+      })));
+    }
+
+    function buildHalfSections(markets) {
+      const byType = groupBy(markets, market => market.type);
+      const resultEntry = (type, title, id) => {
+        const list = byType.get(type) || [];
+        return list.length ? makeEntry(id, title, "常规时间", list, yesOutcomes(list)) : null;
+      };
+      const ouEntry = (type, title, id) => {
+        const list = byType.get(type) || [];
+        if (!list.length) return null;
+        const preferredLine = type === "first_half_totals" ? 0.5 : type === "second_half_totals" ? 1.5 : null;
+        const variants = list.map(market => overUnderVariant(market, title)).sort((a, b) => Number(a.selectorLabel) - Number(b.selectorLabel));
+        if (preferredLine != null) variants.forEach(variant => { variant.preferred = Number(variant.selectorLabel) === preferredLine; });
+        return makeSelectorEntry(id, title, "常规时间", list, variants);
+      };
+      const teamOuEntries = (type, halfLabel, idPrefix) => {
+        const result = [];
+        for (const [team, list] of groupBy(byType.get(type) || [], market => teamFromTitle(market.title))) {
+          const variants = list.map(market => overUnderVariant(market, `${team} ${halfLabel}`)).sort((a, b) => Number(a.selectorLabel) - Number(b.selectorLabel));
+          variants.forEach(variant => { variant.preferred = Number(variant.selectorLabel) === 0.5; });
+          result.push(makeSelectorEntry(`${idPrefix}-${team}`, `${team}${halfLabel === "1H" ? "上半场" : "下半场"}总分`, "常规时间", list, variants));
+        }
+        return result;
+      };
+
+      const firstBtts = (byType.get("both_teams_to_score_first_half") || [])[0];
+      const secondBtts = (byType.get("both_teams_to_score_second_half") || [])[0];
+      const first = [
+        resultEntry("soccer_halftime_result", "半场结果", "halftime-result"),
+        ouEntry("first_half_totals", "上半场总分", "first-half-total"),
+        firstBtts ? makeBttsEntry("btts-first-half", "上半场双方进球", firstBtts) : null,
+        ...teamOuEntries("soccer_first_half_team_totals", "1H", "fh-team-total"),
+      ].filter(Boolean);
+      const second = [
+        resultEntry("soccer_second_half_result", "下半场结果", "second-half-result"),
+        ouEntry("second_half_totals", "下半场总分", "second-half-total"),
+        secondBtts ? makeBttsEntry("btts-second-half", "下半场双方进球", secondBtts) : null,
+        ...teamOuEntries("soccer_second_half_team_totals", "2H", "sh-team-total"),
+      ].filter(Boolean);
+
+      return [
+        { title: "上半场", entries: first },
+        { title: "下半场", entries: second },
+      ];
+    }
+
+    function buildGroupedEntries(markets, categoryId) {
+      const byType = groupBy(markets, market => market.type);
+      const entries = [];
+      const addSingles = list => list.forEach(market => entries.push({
+        id: `single-${market.id}`,
+        title: market.title,
+        periodLabel: market.periodLabel,
+        volumeText: market.volumeText,
+        markets: [market],
+        outcomes: market.outcomes,
+        searchText: `${market.typeLabel} ${market.title} ${market.question}`.toLowerCase(),
+      }));
+
+      const addResultGroup = (type, title, id) => {
+        const list = byType.get(type) || [];
+        if (list.length) entries.push(makeEntry(id || type, title, list[0].periodLabel, list, yesOutcomes(list)));
+      };
+      const addOuGroup = (type, title, id) => {
+        const list = byType.get(type) || [];
+        if (list.length) entries.push(makeSelectorEntry(id || type, title, list[0].periodLabel, list, list.map(m => overUnderVariant(m, title)).sort((a, b) => Number(a.selectorLabel) - Number(b.selectorLabel))));
+      };
+      const addTeamOuGroups = (type, prefix, idPrefix) => {
+        for (const [team, list] of groupBy(byType.get(type) || [], market => teamFromTitle(market.title))) {
+          entries.push(makeSelectorEntry(`${idPrefix}-${team}`, `${team} ${prefix}`, list[0]?.periodLabel, list, list.map(m => overUnderVariant(m, `${team} ${prefix}`)).sort((a, b) => Number(a.selectorLabel) - Number(b.selectorLabel))));
+        }
+      };
+      const addPlayerGroups = (type, suffix, idPrefix) => {
+        for (const [player, list] of groupBy(byType.get(type) || [], market => playerAndThreshold(market.title).player)) {
+          entries.push(makeSelectorEntry(`${idPrefix}-${player}`, `${player}: ${suffix}`, list[0]?.periodLabel, list, playerVariants(list)));
+        }
+      };
+
+      if (categoryId === "game-lines") {
+        const advance = byType.get("soccer_team_to_advance") || [];
+        if (advance.length) {
+          const adv = makeEntry("team-advance", "晋级球队", advance[0].periodLabel, advance, advance[0].outcomes.map(o => ({ ...o, label: teamShort(o.label) })));
+          adv.noCombo = true; // knockout final result — display only, not combo-able
+          entries.push(adv);
+        }
+        addResultGroup("moneyline", "胜平负", "moneyline");
+        const spreads = byType.get("spreads") || [];
+        if (spreads.length) entries.push(makeSelectorEntry("spreads", "让分", "常规时间", spreads, spreads.map(spreadVariant).sort((a, b) => {
+          if (a.team !== b.team) return a.team === "FRA" ? -1 : 1;
+          return a.team === "FRA" ? b.abs - a.abs : a.abs - b.abs;
+        })));
+        addOuGroup("totals", "总分", "totals");
+        addTeamOuGroups("soccer_team_totals", "球队总分", "team-totals");
+        const btts = byType.get("both_teams_to_score") || [];
+        if (btts.length) entries.push(makeEntry("both-teams", "双方都进球？", btts[0].periodLabel, btts, btts[0].outcomes.map(o => ({ ...o, label: o.label === "是的" ? "是" : "否" }))));
+        addResultGroup("soccer_first_to_score", "先进球", "first-score");
+      } else if (categoryId === "halves") {
+        addResultGroup("soccer_halftime_result", "半场结果", "halftime-result");
+        addResultGroup("soccer_second_half_result", "下半场结果", "second-half-result");
+        addOuGroup("first_half_totals", "上半场总分", "first-half-total");
+        addOuGroup("second_half_totals", "下半场总分", "second-half-total");
+        addTeamOuGroups("soccer_first_half_team_totals", "上半场球队总分", "fh-team-total");
+        addTeamOuGroups("soccer_second_half_team_totals", "下半场球队总分", "sh-team-total");
+        addSingles([...(byType.get("both_teams_to_score_first_half") || []), ...(byType.get("both_teams_to_score_second_half") || [])]);
+      } else if (categoryId === "corners") {
+        addOuGroup("total_corners", "总角球", "total-corners");
+        addTeamOuGroups("soccer_team_total_corners", "球队角球", "team-corners");
+        addOuGroup("soccer_first_half_total_corners", "上半场总角球", "fh-corners");
+        addOuGroup("soccer_second_half_total_corners", "下半场总角球", "sh-corners");
+        addSingles([...(byType.get("soccer_first_corner") || []), ...(byType.get("soccer_game_corners_odd_even") || [])]);
+      } else if (categoryId === "goals") {
+        addPlayerGroups("soccer_player_goals", "进球", "player-goals");
+        addPlayerGroups("soccer_player_goals_plus_assists", "进球+助攻", "player-ga");
+      } else if (categoryId === "assists") {
+        addPlayerGroups("soccer_player_assists", "助攻", "player-assists");
+      } else if (categoryId === "shots") {
+        addPlayerGroups("soccer_player_shots", "射门", "player-shots");
+        addPlayerGroups("soccer_player_shots_on_target", "射正", "player-sot");
+      } else {
+        addSingles(markets);
+      }
+
+      return entries;
+    }
+
+    function renderEntry(entry) {
+      const selected = entry.variants?.length ? getSelectedVariant(entry) : null;
+      const activeVariant = selected == null ? null : entry.variants[selected];
+      const selOi = selectedOutcomes.has(entry.id) ? selectedOutcomes.get(entry.id) : -1;
+      const comboOk = (typeof isPropRoute === "undefined" || !isPropRoute) && !entry.noCombo; // match-detail markets are combo-able, except noCombo (e.g. Team to Advance)
+      const cmbGroup = entry.comboGroup || entry.id;
+      const cmbMarket = entry.comboMarket || entry.title;
+      const cmbSlug = comboOk ? ((latestData && latestData.event && latestData.event.slug) || "") : "";
+      const cmbMatch = comboOk ? comboMatchTitle() : "";
+      const outcomes = (activeVariant?.outcomes || entry.outcomes || []).map((outcome, oi) => {
+        const col = outcome.color || "";
+        let isSel, attrs;
+        if (comboOk) {
+          const oid = outcome.side || outcome.label || `o${oi}`;
+          isSel = typeof comboHas === "function" && comboHas(`${cmbSlug}|${cmbGroup}`, oid);
+          attrs = ` data-entry="${esc(entry.id)}" data-oi="${oi}" data-combo="1" data-slug="${esc(cmbSlug)}" data-group="${esc(cmbGroup)}" data-oid="${esc(oid)}" data-match="${esc(cmbMatch)}" data-market="${esc(cmbMarket)}" data-label="${esc(outcome.label)}" data-price="${esc(String(outcome.price == null ? "" : outcome.price))}"`;
+        } else {
+          isSel = oi === selOi;
+          attrs = ` data-entry="${esc(entry.id)}" data-oi="${oi}"`;
+        }
+        const styleVars = (isSel && col) ? ` style="--sel-bg:${esc(col)};--sel-fg:${esc(fixtureTextColor(col))};--sel-shadow:${esc(fixtureDarken(col, 0.28))}"` : "";
+        return `<span class="outcome ${esc(outcome.tone || "")}${isSel ? " selected" : ""}"${col ? ` data-color="${esc(col)}"` : ""}${attrs}${styleVars}><b>${esc(outcome.label)}</b><strong>${esc(formatOdds(outcome.price))}</strong></span>`;
+      }).join("");
+      const outcomeClass = (activeVariant?.outcomes || entry.outcomes || []).length === 3 ? "outcomes count-3" : "outcomes";
+      const selector = entry.variants?.length > 1 ? `
+        <div class="line-selector">
+          <div class="line-arrow">‹</div>
+          <div class="line-options">
+            ${entry.variants.map((variant, index) => `<button type="button" class="${index === selected ? "active" : ""}" data-group-id="${esc(entry.id)}" data-variant-index="${index}">${esc(variant.selectorLabel)}</button>`).join("")}
+          </div>
+          <div class="line-arrow">›</div>
+        </div>
+      ` : "";
+      return `
+        <article class="market-row ${selector ? "has-selector" : ""}" data-market-text="${esc(entry.searchText || entry.title.toLowerCase())}">
+          <div class="market-head">
+            <div class="market-copy">
+              <div class="market-kicker"><span>${esc(entry.periodLabel || "常规时间")}</span><span>ⓘ</span></div>
+              <h3 class="market-title">${esc(entry.title)}</h3>
+              <p class="market-question">${esc(entry.volumeText || "-- 交易量")}</p>
+            </div>
+          </div>
+          <div class="${outcomeClass}">${outcomes}</div>
+          ${selector}
+        </article>
+      `;
+    }
+
+    function renderMoneyline(data) {
+      const markets = orderedMoneylineItems(data.markets.filter(market => market.type === "moneyline").map((market, index) => ({ ...market, label: market.title, index })));
+      document.getElementById("moneyline-count").textContent = `${markets.length} 项`;
+      document.getElementById("moneyline").innerHTML = markets.map(market => {
+        const yes = market.outcomes.find(outcome => outcome.label.startsWith("是")) || market.outcomes[0];
+        return `<div class="moneyline-row"><span>${esc(market.title)}</span><strong>${esc(yes?.priceText || "-")}</strong></div>`;
+      }).join("");
+    }
+
+    function currentCategory(data) {
+      const fromHash = location.hash ? location.hash.slice(1) : null;
+      const candidate = activeCategoryId || fromHash || data.categories[0]?.id;
+      return data.categories.find(category => category.id === candidate) || data.categories[0];
+    }
+
+    function renderActiveCategory(data) {
+      const category = currentCategory(data);
+      activeCategoryId = category?.id || null;
+      if (!category) {
+        document.getElementById("sections").innerHTML = `<div class="empty">暂无盘口</div>`;
+        return;
+      }
+
+      const markets = data.markets
+        .filter(market => market.categoryId === category.id)
+        .sort((a, b) => (a.typeLabel + a.title).localeCompare(b.typeLabel + b.title, "zh-CN", { numeric: true }));
+      const entries = buildGroupedEntries(markets, category.id);
+
+      if (category.id === "halves") {
+        const sections = buildHalfSections(markets);
+        const groupCount = sections.reduce((sum, section) => sum + section.entries.length, 0);
+        document.getElementById("sections").innerHTML = `
+          <section class="market-section" data-category="${esc(category.id)}">
+            <div class="section-head">
+              <h2>${esc(category.label)}</h2>
+              <span>${groupCount} 组 / ${category.count} 个盘口</span>
+            </div>
+            ${sections.map(section => `
+              <div class="subsection">
+                <h3 class="subsection-title">${esc(section.title)}</h3>
+                <div class="market-list">${section.entries.map(renderEntry).join("")}</div>
+              </div>
+            `).join("")}
+          </section>
+        `;
+        return;
+      }
+
+      document.getElementById("sections").innerHTML = `
+        <section class="market-section" data-category="${esc(category.id)}">
+          <div class="section-head">
+            <h2>${esc(category.label)}</h2>
+            <span>${entries.length} 组 / ${category.count} 个盘口</span>
+          </div>
+          <div class="market-list">${entries.map(renderEntry).join("")}</div>
+        </section>
+      `;
+    }
+
+    function fmtKickoffDate(value) {
+      if (!value) return "--";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return "--";
+      const parts = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "numeric", day: "numeric" }).formatToParts(d);
+      const mo = (parts.find(p => p.type === "month") || {}).value;
+      const da = (parts.find(p => p.type === "day") || {}).value;
+      const cn = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+      return (cn[Number(mo)] || mo) + "月 " + da;
+    }
+
+    function render(data) {
+      latestData = data;
+      if (chartViewMode === "live") renderLiveStats(data);
+      const home = data.event.teams?.home || data.event.title.split("vs")[0] || data.event.title;
+      const away = data.event.teams?.away || data.event.title.split("vs")[1] || "";
+
+      document.title = `${data.event.title} | Polymarket 盘口`;
+      document.getElementById("home-team").textContent = home;
+      document.getElementById("away-team").textContent = away;
+      setFlagElement("home-flag", data.event.home || home);
+      setFlagElement("away-flag", data.event.away || away);
+      document.getElementById("game-time").textContent = fmtFixtureTime(data.event.endDate);
+      document.getElementById("game-date").textContent = fmtKickoffDate(data.event.endDate);
+      document.getElementById("refresh-time").textContent = fmtDate(data.snapshotAt, true);
+      document.getElementById("market-time").textContent = fmtDate(data.event.updatedAt, true);
+      document.getElementById("market-count").textContent = `${data.totalMarkets} 个`;
+      document.getElementById("event-state").textContent = data.event.closed ? "已结束" : "开放";
+
+      const category = currentCategory(data);
+
+      // Smaller leagues carry no player/corner props at all, so hide empty
+      // categories rather than showing a row of dead "0" tabs. The active one
+      // always stays visible so the current view can't vanish.
+      document.getElementById("tabs").innerHTML = data.categories
+        .filter(item => item.count > 0 || item.id === category.id)
+        .map(item =>
+          `<button type="button" class="${item.id === category.id ? "active" : ""}" data-category="${esc(item.id)}">${esc(item.label)}<span>${item.count}</span></button>`
+        ).join("");
+
+      renderActiveCategory(data);
+      renderMoneyline(data);
+      renderLiveStats(data);
+      applySearch();
+      if (typeof comboRender === "function") comboRender();
+    }
+
+    function applySearch() {
+      document.querySelectorAll(".market-row.hidden, .prop-card.hidden, .fixture-card.hidden, .prop-market-row.hidden").forEach(row => {
+        row.classList.remove("hidden");
+      });
+    }
+
+    async function loadMarkets() {
+      const status = document.getElementById("status");
+      try {
+        const response = await fetch(apiUrl("/api/markets"), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        render(data);
+        status.classList.toggle("error", Boolean(data.stale));
+        status.innerHTML = `<span>${data.stale ? "使用缓存" : "实时更新"}</span><span>${fmtDate(data.snapshotAt, true)}</span>`;
+      } catch (error) {
+        status.classList.add("error");
+        status.innerHTML = `<span>刷新失败</span><span>${esc(error.message)}</span>`;
+      }
+    }
+
+    async function loadFixtures() {
+      const list = document.getElementById("fixture-list");
+      try {
+        const response = await fetch(apiUrl("/api/fixtures"), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        latestFixtures = data.fixtures || [];
+        renderFixtures(latestFixtures);
+      } catch (error) {
+        if (!latestFixtures.length) list.innerHTML = `<div class="empty">比赛加载失败：${esc(error.message)}</div>`;
+      }
+    }
+
+    async function loadProps(category = activePropsCategory) {
+      const list = document.getElementById("props-list");
+      activePropsCategory = category;
+      renderPropsTabs(latestPropsData?.categories || [{ id: "all", label: "全部" }]);
+      list.innerHTML = `<div class="empty">正在加载玩法</div>`;
+      try {
+        const response = await fetch(apiUrl("/api/props", { category }), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        renderProps(data);
+      } catch (error) {
+        list.innerHTML = `<div class="empty">玩法加载失败：${esc(error.message)}</div>`;
+      }
+    }
+
+    async function loadMap() {
+      try {
+        const response = await fetch(apiUrl("/api/prop-event", { slug: "world-cup-winner" }), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        renderMap(data);
+      } catch (error) {
+        document.getElementById("globe-tip").textContent = `地图加载失败：${error.message}`;
+        document.getElementById("map-rank-list").innerHTML = `<div class="empty">地图加载失败：${esc(error.message)}</div>`;
+      }
+    }
+
+    async function loadPropDetail() {
+      const list = document.getElementById("prop-detail-list");
+      try {
+        if (!propSlug) throw new Error("缺少玩法 slug");
+        const response = await fetch(apiUrl("/api/prop-event", { slug: propSlug }), { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        renderPropDetail(data);
+      } catch (error) {
+        list.innerHTML = `<div class="empty">玩法盘口加载失败：${esc(error.message)}</div>`;
+      }
+    }
+
+    document.querySelector(".sports-tabs").addEventListener("click", event => {
+      const button = event.target.closest("button[data-home-tab]");
+      if (!button || isDetailRoute) return;
+      setHomeTab(button.dataset.homeTab);
+      if (button.dataset.homeTab === "props" && !latestPropsData) loadProps();
+      if (button.dataset.homeTab === "map" && !latestMapData) loadMap();
+    });
+    document.getElementById("props-tabs").addEventListener("click", event => {
+      const button = event.target.closest("button[data-props-category]");
+      if (!button) return;
+      loadProps(button.dataset.propsCategory);
+    });
+    document.getElementById("tabs").addEventListener("click", event => {
+      const button = event.target.closest("button[data-category]");
+      if (!button || !latestData) return;
+      activeCategoryId = button.dataset.category;
+      const nextUrl = new URL(location.href);
+      nextUrl.hash = activeCategoryId;
+      history.replaceState(null, "", nextUrl);
+      render(latestData);
+    });
+    document.getElementById("sections").addEventListener("click", event => {
+      const opt = event.target.closest(".outcome[data-entry]");
+      if (opt) {
+        if (opt.dataset.combo) {
+          comboToggle({ slug: opt.dataset.slug, group: opt.dataset.group, oid: opt.dataset.oid, matchTitle: opt.dataset.match, marketLabel: opt.dataset.market, label: opt.dataset.label, price: Number(opt.dataset.price), flag: opt.dataset.flag || "" });
+          return;
+        }
+        const id = opt.dataset.entry, oi = Number(opt.dataset.oi);
+        if (selectedOutcomes.get(id) === oi) selectedOutcomes.delete(id);
+        else selectedOutcomes.set(id, oi);
+        const group = opt.closest(".outcomes");
+        if (group) group.querySelectorAll(".outcome").forEach(el => {
+          const on = selectedOutcomes.get(id) === Number(el.dataset.oi);
+          el.classList.toggle("selected", on);
+          const col = el.dataset.color;
+          if (on && col) {
+            el.style.setProperty("--sel-bg", col);
+            el.style.setProperty("--sel-fg", fixtureTextColor(col));
+            el.style.setProperty("--sel-shadow", fixtureDarken(col, 0.28));
+          } else {
+            el.style.removeProperty("--sel-bg");
+            el.style.removeProperty("--sel-fg");
+            el.style.removeProperty("--sel-shadow");
+          }
+        });
+        return;
+      }
+      const button = event.target.closest("button[data-group-id][data-variant-index]");
+      if (!button || !latestData) return;
+      selectedVariants.set(button.dataset.groupId, Number(button.dataset.variantIndex));
+      renderActiveCategory(latestData);
+      applySearch();
+    });
+    document.getElementById("chart-ranges").addEventListener("click", event => {
+      const button = event.target.closest("button[data-range]");
+      if (button) loadChart(button.dataset.range);
+    });
+    function renderOddsMenu() {
+      const menu = document.getElementById("odds-fmt-menu");
+      if (!menu) return;
+      menu.innerHTML = `<div class="odds-fmt-title">赔率格式</div>` + ODDS_FORMATS.map(f =>
+        `<div class="odds-fmt-item ${f.id === oddsFormat ? "active" : ""}" role="menuitemradio" data-odds-format="${f.id}">${esc(f.label)}<span class="odds-fmt-dot"></span></div>`
+      ).join("");
+    }
+    function applyOddsFormat(fmt) {
+      oddsFormat = fmt;
+      try { localStorage.setItem("oddsFormat", fmt); } catch (e) {}
+      renderOddsMenu();
+      const menu = document.getElementById("odds-fmt-menu");
+      if (menu) menu.hidden = true;
+      if (activeHomeTab === "games") renderFixtures(latestFixtures);
+      else if (activeHomeTab === "props" && latestPropsData) renderProps(latestPropsData);
+    }
+    (function initOddsFmt() {
+      const btn = document.getElementById("odds-fmt-btn");
+      const menu = document.getElementById("odds-fmt-menu");
+      if (!btn || !menu) return;
+      renderOddsMenu();
+      btn.addEventListener("click", (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; });
+      menu.addEventListener("click", (e) => {
+        const item = e.target.closest("[data-odds-format]");
+        if (item) applyOddsFormat(item.dataset.oddsFormat);
+      });
+      document.addEventListener("click", (e) => {
+        if (!menu.hidden && !e.target.closest("#odds-fmt")) menu.hidden = true;
+      });
+    })();
+
+    let chartViewMode = "market";
+    let lsCountdownTimer = null;
+    let marketsPollTimer = null;
+
+    // Adaptive markets polling: fast while live, slow pre-match (countdown is
+    // client-side so odds barely move), and STOP once the match has ended (static).
+    // Backend cache is ~5s, so polling faster than that just hits cache — 10s live
+    // keeps odds fresh without extra Gamma load. Speeds up near kickoff to catch
+    // the pre→live transition promptly.
+    function scheduleMarketsPoll() {
+      clearTimeout(marketsPollTimer);
+      const e = (latestData && latestData.event) || {};
+      const st = matchStatus(e);
+      if (st.kind === "ended") return; // data is final — stop polling
+      let delay = 60000;
+      if (st.kind === "live") delay = 10000;
+      else {
+        const mins = (new Date(e.startTime || e.endDate).getTime() - Date.now()) / 60000;
+        if (!(mins > 10)) delay = 20000; // within 10 min of kickoff (or already past)
+      }
+      marketsPollTimer = setTimeout(() => { loadMarkets().finally(scheduleMarketsPoll); }, delay);
+    }
+
+    // --- Option A upgrade seam (Sportradar LMT) -------------------------------
+    // Empty = use the Polymarket-only panel below (Option C). To show the official
+    // Sportradar Live Match Tracker, register your OWN Sportradar widget account,
+    // get a client ID authorized for this domain, and set it here. (Polymarket's
+    // own client ID is origin-locked to polymarket.com and cannot be reused.)
+    const SR_WIDGET_CLIENT_ID = "";
+    function mountSportradarLMT(host, matchId) {
+      const run = () => window.SIR && window.SIR("addWidget", host, "match.lmtPlus", { matchId: Number(matchId) });
+      if (window.SIR) { run(); return; }
+      if (!document.getElementById("sr-widgetloader")) {
+        const s = document.createElement("script");
+        s.id = "sr-widgetloader";
+        s.async = true;
+        s.src = `https://widgets.sir.sportradar.com/${SR_WIDGET_CLIENT_ID}/widgetloader`;
+        s.onload = run;
+        document.head.appendChild(s);
+      } else {
+        document.getElementById("sr-widgetloader").addEventListener("load", run, { once: true });
+      }
+    }
+
+    function clearLsCountdown() {
+      if (lsCountdownTimer) { clearInterval(lsCountdownTimer); lsCountdownTimer = null; }
+    }
+    function startLsCountdown(targetIso) {
+      clearLsCountdown();
+      const target = new Date(targetIso).getTime();
+      const tick = () => {
+        const host = document.getElementById("ls-countdown");
+        if (!host) { clearLsCountdown(); return; }
+        let diff = Math.max(0, (Number.isNaN(target) ? Date.now() : target) - Date.now());
+        const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+        const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+        const m = Math.floor(diff / 60000); diff -= m * 60000;
+        const s = Math.floor(diff / 1000);
+        const set = (id, v) => { const el = host.querySelector("#cd-" + id); if (el) el.textContent = String(v).padStart(2, "0"); };
+        set("d", d); set("h", h); set("m", m); set("s", s);
+      };
+      tick();
+      lsCountdownTimer = setInterval(tick, 1000);
+    }
+
+    // Derive a single status from raw Gamma fields (no guessing via score string).
+    function matchStatus(e) {
+      const period = String(e.period || "").toUpperCase();
+      const hasScore = /\d+\s*-\s*\d+/.test(String(e.score || ""));
+      if (e.ended || (e.closed && hasScore)) return { kind: "ended" };
+      if (e.live) {
+        const el = e.elapsed ? " " + e.elapsed : "";
+        if (period === "HT") return { kind: "live", badge: "中场休息", live: false };
+        if (period === "1H") return { kind: "live", badge: "上半场" + el, live: true };
+        if (period === "2H") return { kind: "live", badge: "下半场" + el, live: true };
+        if (period === "ET" || period === "AET") return { kind: "live", badge: "加时赛" + el, live: true };
+        if (period === "P" || period === "PEN" || period === "AP") return { kind: "live", badge: "点球大战", live: true };
+        return { kind: "live", badge: "进行中" + el, live: true };
+      }
+      return { kind: "pre" };
+    }
+
+    // Win/Draw/Loss segments from moneyline markets — classified by matching the
+    // market title to home/away team identifiers (robust; avoids teamShort drift).
+    function liveProbSegments(data) {
+      const e = data.event || {};
+      const home = e.home || {}, away = e.away || {};
+      const ml = (data.markets || []).filter(m => m.type === "moneyline");
+      if (!ml.length) return [];
+      const hit = (title, team) => {
+        if (!team) return false;
+        const t = String(title || "");
+        if (team.nameZh && t.includes(team.nameZh)) return true;
+        if (team.name && new RegExp(team.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(t)) return true;
+        if (team.abbr && t.toUpperCase().includes(team.abbr)) return true;
+        return false;
+      };
+      const slot = {};
+      ml.forEach(m => {
+        const yes = marketYes(m);
+        const price = Number(yes && yes.price) || 0;
+        const title = m.title || "";
+        let key;
+        if (/平局|draw/i.test(title)) key = "draw";
+        else if (hit(title, home)) key = "home";
+        else if (hit(title, away)) key = "away";
+        else return;
+        slot[key] = {
+          price,
+          label: key === "draw" ? "平局" : key === "home" ? (home.nameZh || home.name || home.abbr) : (away.nameZh || away.name || away.abbr),
+          color: key === "draw" ? "#aab8f0" : key === "home" ? (home.color || "#2f5fd0") : (away.color || "#2f9e67"),
+        };
+      });
+      const ordered = ["home", "draw", "away"].map(k => slot[k]).filter(Boolean);
+      const segs = ordered.length ? ordered : Object.values(slot);
+      const sum = segs.reduce((a, x) => a + x.price, 0) || 1;
+      return segs.map(s => ({ label: s.label, color: s.color, pct: s.price / sum }));
+    }
+    function probBarHtml(segs) {
+      return `<div class="ls-prob">
+          <div class="ls-prob-bar">${segs.map(s => `<span style="width:${(s.pct * 100).toFixed(1)}%;background:${esc(s.color)}"></span>`).join("")}</div>
+          <div class="ls-prob-legend">${segs.map(s => `<span>${esc(s.label)} ${Math.round(s.pct * 100)}%</span>`).join("")}</div>
+        </div>`;
+    }
+
+    function renderLiveStats(data) {
+      const host = document.getElementById("live-stats");
+      if (!host || !data) return;
+      const e = data.event || {};
+
+      // Option A: official Sportradar widget when a client ID is configured.
+      if (SR_WIDGET_CLIENT_ID && e.sportradarGameId) {
+        clearLsCountdown();
+        if (host.dataset.srMatch !== String(e.sportradarGameId)) {
+          host.dataset.srMatch = String(e.sportradarGameId);
+          host.innerHTML = '<div class="sr-lmt"></div>';
+          mountSportradarLMT(host.querySelector(".sr-lmt"), e.sportradarGameId);
+        }
+        return;
+      }
+      delete host.dataset.srMatch;
+
+      const home = e.home || {}, away = e.away || {};
+      const st = matchStatus(e);
+      const startTime = e.startTime || e.endDate;
+      const flag = (t) => (t && t.flag) ? `<span class="flag"><img src="${esc(t.flag)}" alt="" onerror="this.remove()"></span>` : `<span class="flag"></span>`;
+      const homeRow = `<div class="ls-team">${flag(home)}<span>${esc(home.nameZh || home.name || "主队")}</span></div>`;
+      const awayRow = `<div class="ls-team ls-away"><span>${esc(away.nameZh || away.name || "客队")}</span>${flag(away)}</div>`;
+      const parts = String(e.score || "").split("-").map(s => s.trim());
+      const hs = /\d/.test(parts[0] || "") ? parts[0] : "0";
+      const as = /\d/.test(parts[1] || "") ? parts[1] : "0";
+      const nums = `<div class="ls-nums"><b>${esc(hs)}</b><i>-</i><b>${esc(as)}</b></div>`;
+
+      let badge, badgeCls, center, below = "";
+      if (st.kind === "ended") {
+        badge = "全场结束"; badgeCls = "ls-ended"; center = nums;
+        const hn = home.nameZh || home.name || "主队", an = away.nameZh || away.name || "客队";
+        const res = Number(hs) > Number(as) ? `${hn} 胜` : Number(as) > Number(hs) ? `${an} 胜` : "平局";
+        below = `<div class="ls-result">${esc(res)}</div>`;
+      } else if (st.kind === "live") {
+        badge = st.badge; badgeCls = st.live ? "ls-live" : "ls-ended"; center = nums;
+        const segs = liveProbSegments(data);
+        if (segs.length) below = probBarHtml(segs);
+      } else {
+        badge = "未开赛"; badgeCls = "ls-pre";
+        center = `<div class="ls-kick"><span>${esc(fmtFixtureTime(startTime))}</span><small>${esc(fmtKickoffDate(startTime))}</small></div>`;
+        below = `<div class="ls-countdown" id="ls-countdown">
+            <div class="cd-box"><b id="cd-d">00</b><span>天</span></div>
+            <div class="cd-box"><b id="cd-h">00</b><span>时</span></div>
+            <div class="cd-box"><b id="cd-m">00</b><span>分</span></div>
+            <div class="cd-box"><b id="cd-s">00</b><span>秒</span></div>
+          </div>`;
+        const segs = liveProbSegments(data);
+        if (segs.length) below += probBarHtml(segs);
+      }
+
+      host.innerHTML = `
+        <div class="ls-badge ${badgeCls}">${esc(badge)}</div>
+        <div class="ls-score">${homeRow}${center}${awayRow}</div>
+        ${below}
+      `;
+
+      if (st.kind === "pre") startLsCountdown(startTime);
+      else clearLsCountdown();
+    }
+    function setChartView(mode) {
+      chartViewMode = mode;
+      document.getElementById("chart-body").classList.toggle("hidden", mode !== "market");
+      document.getElementById("chart-ranges").classList.toggle("hidden", mode !== "market");
+      document.getElementById("live-stats").classList.toggle("hidden", mode !== "live");
+      document.querySelectorAll("#chart-switch button").forEach(b => { b.className = b.dataset.chartView === mode ? "switch-pill" : "switch-muted"; });
+      if (mode === "live" && latestData) renderLiveStats(latestData);
+      else clearLsCountdown();
+    }
+    const chartSwitchEl = document.getElementById("chart-switch");
+    if (chartSwitchEl) chartSwitchEl.addEventListener("click", (event) => {
+      const b = event.target.closest("button[data-chart-view]");
+      if (b) setChartView(b.dataset.chartView);
+    });
+
+    syncRouteView();
+    if (isPropRoute) {
+      loadPropDetail();
+      setInterval(loadPropDetail, 60000);
+    } else if (isDetailRoute) {
+      showDetailLoading();
+      loadMarkets().then(() => { loadChart(); scheduleMarketsPoll(); });
+      setInterval(() => loadChart(activeRange), 60000);
+    } else {
+      setHomeTab(activeHomeTab);
+      loadFixtures();
+      if (activeHomeTab === "props") loadProps();
+      if (activeHomeTab === "map") loadMap();
+      setInterval(loadFixtures, refreshMs);
+      setInterval(() => {
+        if (activeHomeTab === "props") loadProps(activePropsCategory);
+        if (activeHomeTab === "map") loadMap();
+      }, 60000);
+    }
+    comboInit();
+  </script>
+</body>
+</html>

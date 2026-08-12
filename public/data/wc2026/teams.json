@@ -1,0 +1,290 @@
+[
+  {
+    "name": "Mexico",
+    "abbr": "MEX",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Mexico-588139357c.png",
+    "color": "#107051"
+  },
+  {
+    "name": "South Africa",
+    "abbr": "RSA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/South Africa-ddc27e566d.png",
+    "color": "#10704b"
+  },
+  {
+    "name": "Korea Republic",
+    "abbr": "KR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Korea Republic-b5f547fe00.png",
+    "color": "#cc2e3b"
+  },
+  {
+    "name": "Czechia",
+    "abbr": "CZE",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Czechia-c4f864173e.png",
+    "color": "#cd1d23"
+  },
+  {
+    "name": "Canada",
+    "abbr": "CAN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Canada-cc8569a54a.png",
+    "color": "#d62b1f"
+  },
+  {
+    "name": "Bosnia and Herzegovina",
+    "abbr": "BIH",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Bosnia-Herzegovina-82fd3e6897.png",
+    "color": "#1b42c0"
+  },
+  {
+    "name": "United States",
+    "abbr": "USA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/United States-3f0cb1df78.png",
+    "color": "#b31942"
+  },
+  {
+    "name": "Paraguay",
+    "abbr": "PAR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Paraguay-54e3a213af.png",
+    "color": "#d62b1f"
+  },
+  {
+    "name": "Qatar",
+    "abbr": "QAT",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Qatar-904d4eb738.png",
+    "color": "#96173D"
+  },
+  {
+    "name": "Switzerland",
+    "abbr": "CHE",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Switzerland-57e3536db6.png",
+    "color": "#c02121"
+  },
+  {
+    "name": "Brazil",
+    "abbr": "BRA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Brazil-113390b1cc.png",
+    "color": "#128143"
+  },
+  {
+    "name": "Morocco",
+    "abbr": "MAR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Morocco-ef469e847f.png",
+    "color": "#be272c"
+  },
+  {
+    "name": "Haiti",
+    "abbr": "HAI",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Haiti-fde323ee55.png",
+    "color": "#1d3fc9"
+  },
+  {
+    "name": "Scotland",
+    "abbr": "SCO",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Scotland-684c7cd37b.png",
+    "color": "#175ea1"
+  },
+  {
+    "name": "Australia",
+    "abbr": "AUS",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Australia-f9f0b1cf50.png",
+    "color": "#1946ae"
+  },
+  {
+    "name": "Türkiye",
+    "abbr": "TUR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Türkiye-a8ab61f9d3.png",
+    "color": "#cd1d29"
+  },
+  {
+    "name": "Germany",
+    "abbr": "GER",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Germany-ec77efdafe.png",
+    "color": "#c01b1b"
+  },
+  {
+    "name": "Curaçao",
+    "abbr": "KOR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Curaçao-3d8af0bd7f.png",
+    "color": "#1847a5"
+  },
+  {
+    "name": "Netherlands",
+    "abbr": "NLD",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Netherlands-18cda73c33.png",
+    "color": "#2D4383"
+  },
+  {
+    "name": "Japan",
+    "abbr": "JPN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Japan-0aa0acf283.png",
+    "color": "#a51839"
+  },
+  {
+    "name": "Côte d'Ivoire",
+    "abbr": "CIV",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Côte d'Ivoire-6cc43316ac.png",
+    "color": "#e28736"
+  },
+  {
+    "name": "Ecuador",
+    "abbr": "ECU",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Ecuador-00675e68b9.png",
+    "color": "#144e8f"
+  },
+  {
+    "name": "Sweden",
+    "abbr": "SWE",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Sweden-42188bc1ed.png",
+    "color": "#124f81"
+  },
+  {
+    "name": "Tunisia",
+    "abbr": "TUN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Tunisia-a426b4950d.png",
+    "color": "#c91d2b"
+  },
+  {
+    "name": "Spain",
+    "abbr": "ESP",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Spain-5cfe661c09.png",
+    "color": "#aa181d"
+  },
+  {
+    "name": "Cabo Verde",
+    "abbr": "CVI",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Cabo Verde-eaec07ae28.png",
+    "color": "#164a9c"
+  },
+  {
+    "name": "Belgium",
+    "abbr": "BEL",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Belgium-3d1c700460.png",
+    "color": "#e43f4a"
+  },
+  {
+    "name": "Egypt",
+    "abbr": "EGY",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Egypt-eeec6cd72b.png",
+    "color": "#bb1b36"
+  },
+  {
+    "name": "Saudi Arabia",
+    "abbr": "KSA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Saudi Arabia-c15de67d17.png",
+    "color": "#10703e"
+  },
+  {
+    "name": "Uruguay",
+    "abbr": "URY",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Uruguay-d6429d6654.png",
+    "color": "#1849aa"
+  },
+  {
+    "name": "IR Iran",
+    "abbr": "IRN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/IR Iran-963a3b1b24.png",
+    "color": "#239f40"
+  },
+  {
+    "name": "New Zealand",
+    "abbr": "NZL",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/New Zealand-cce986ab0b.png",
+    "color": "#1946ae"
+  },
+  {
+    "name": "France",
+    "abbr": "FRA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/France-a9fae950fa.png",
+    "color": "#144b8f"
+  },
+  {
+    "name": "Senegal",
+    "abbr": "SEN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Senegal-5887ca8394.png",
+    "color": "#11733f"
+  },
+  {
+    "name": "Iraq",
+    "abbr": "IRQ",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Iraq-171ced4a5b.png",
+    "color": "#c41c2d"
+  },
+  {
+    "name": "Norway",
+    "abbr": "NOR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Norway-9b74811d97.png",
+    "color": "#ae1937"
+  },
+  {
+    "name": "Argentina",
+    "abbr": "ARG",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Argentina-89bddb3014.png",
+    "color": "#67A4DC"
+  },
+  {
+    "name": "Algeria",
+    "abbr": "ALG",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Algeria-b5bff71d9f.png",
+    "color": "#107040"
+  },
+  {
+    "name": "Austria",
+    "abbr": "AUT",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Austria-b4437b99a6.png",
+    "color": "#bb1b36"
+  },
+  {
+    "name": "Jordan",
+    "abbr": "JOR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Jordan-32e5ac9969.png",
+    "color": "#c41c30"
+  },
+  {
+    "name": "Portugal",
+    "abbr": "PRT",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Portugal-4eaa06018e.png",
+    "color": "#df2020"
+  },
+  {
+    "name": "DR Congo",
+    "abbr": "CDR",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/congo-d36722c83a.png",
+    "color": "#2080df"
+  },
+  {
+    "name": "England",
+    "abbr": "ENG",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/England-6f969967fe.png",
+    "color": "#c41c2d"
+  },
+  {
+    "name": "Croatia",
+    "abbr": "HRV",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Croatia-35354d3d29.png",
+    "color": "#df2020"
+  },
+  {
+    "name": "Ghana",
+    "abbr": "GHA",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Ghana-a82010251e.png",
+    "color": "#b79a1a"
+  },
+  {
+    "name": "Panama",
+    "abbr": "PAN",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Panama-512a1e0394.png",
+    "color": "#1849a5"
+  },
+  {
+    "name": "Uzbekistan",
+    "abbr": "UZB",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Uzbekistan-45923e38e4.png",
+    "color": "#4484e4"
+  },
+  {
+    "name": "Colombia",
+    "abbr": "COL",
+    "flag": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Colombia-feca7874f0.png",
+    "color": "#dfb920"
+  }
+]

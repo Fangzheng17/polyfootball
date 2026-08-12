@@ -1,0 +1,20 @@
+{
+  "name": "polymarket-match-live-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "snapshot": "node build-polymarket-dashboard.mjs",
+    "odds:log": "node scripts/odds-logger.mjs",
+    "odds:once": "node scripts/odds-logger.mjs --once",
+    "odds:stats": "node scripts/odds-stats.mjs",
+    "wc:export": "node scripts/export-wc-archive.mjs",
+    "dev:vercel": "vercel dev",
+    "deploy:preview": "vercel",
+    "deploy:prod": "vercel --prod"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

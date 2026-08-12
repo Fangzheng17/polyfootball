@@ -1,0 +1,7 @@
+.vercel
+node_modules
+
+# NOTE: data/odds-log/ is intentionally NOT ignored — the whole point of the
+# GitHub Action is to commit captured odds back to the repo. That includes
+# .last-prices.json (the dedup state): without it every scheduled run starts
+# blank and re-logs every price as a "change".

@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-08-11T21:23:57.378Z",
+  "source": "Polymarket Gamma series 11433",
+  "champion": "Spain",
+  "matchCount": 104,
+  "marketRowCount": 72486,
+  "titleRaceTeams": 60,
+  "caveats": [
+    "Per-match CLOB price history is purged after close (0 points) — per-match odds-over-time is NOT recoverable; only final results survive.",
+    "The world-cup-winner futures markets retain full history — title-race.json is complete.",
+    "stage is a date-heuristic; verify around round boundaries.",
+    "result90 is the 90-MINUTE outcome; 'Draw' is valid even in knockouts (match went to ET/pens). Use `advanced` (from soccer_team_to_advance) to build a bracket — never result90.",
+    "title-race: 0.50 points are pre-first-trade placeholder quotes, NOT market beliefs — they are stripped from `series`. Use preTournamentProb for 'what the market thought before kickoff'; never series[0], which is the market-open default.",
+    "title-race: rows with tradeable=false are illiquid markets with almost no price discovery. EXCLUDE them from calibration/accuracy analysis."
+  ]
+}

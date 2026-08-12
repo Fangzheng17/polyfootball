@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026 世界杯回顾 | Polymarket</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f7f8fa; --surface: #fff; --surface-soft: #f2f4f7;
+    --ink: #111827; --muted: #697586; --muted-2: #8b95a5;
+    --line: #e3e8ef; --line-strong: #cfd8e3;
+    --blue: #1652f0; --blue-soft: #eef4ff; --green: #079455; --red: #b42318;
+    --gold: #b7791f; --gold-soft: #fffaeb;
+    --shadow: 0 8px 20px rgba(16,24,40,.06);
+    font-family: Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); overflow-x: hidden; }
+  .wrap { width: min(1080px, calc(100vw - 28px)); margin: 0 auto; }
+
+  .topbar { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.92);
+    backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .topbar-inner { height: 56px; display: flex; align-items: center; gap: 12px; }
+  .back { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); }
+  .back:hover { border-color: var(--line-strong); color: var(--ink); }
+  .topbar h1 { font-size: 16px; margin: 0; font-weight: 850; }
+
+  section { margin: 22px 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 18px; }
+  h2 { font-size: 15px; margin: 0 0 4px; font-weight: 850; }
+  .sub { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; line-height: 1.5; }
+
+  /* champion hero */
+  .hero { background: linear-gradient(135deg, #fffaeb 0%, #fff 55%);
+    border: 1px solid #f2e0b5; border-radius: 18px; padding: 26px 20px; text-align: center; }
+  .hero .tag { font-size: 12px; font-weight: 800; color: var(--gold); letter-spacing: .14em; }
+  .hero .flag { width: 92px; height: 66px; border-radius: 10px; object-fit: cover;
+    display: block; margin: 14px auto 10px; box-shadow: 0 2px 8px rgba(16,24,40,.18); }
+  .hero .name { font-size: 34px; font-weight: 900; line-height: 1.1; }
+  .hero .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .hero .odds { display: inline-block; margin-top: 12px; font-size: 12.5px; font-weight: 700;
+    color: var(--gold); background: #fff; border: 1px solid #f2e0b5; border-radius: 999px; padding: 6px 14px; }
+
+  /* final card */
+  .final { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+  .final .side { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .final .side img { width: 54px; height: 38px; border-radius: 7px; object-fit: cover;
+    box-shadow: 0 1px 3px rgba(16,24,40,.16); }
+  .final .side b { font-size: 15px; font-weight: 800; }
+  .final .score { font-size: 30px; font-weight: 900; letter-spacing: .02em; }
+  .final .won { color: var(--gold); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 14px; }
+  .chip { font-size: 11.5px; font-weight: 700; color: var(--muted); background: var(--surface-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
+  .chip.hot { color: var(--gold); background: var(--gold-soft); border-color: #f2e0b5; }
+
+  /* title race chart */
+  .chart-wrap { overflow-x: auto; }
+  svg.race { width: 100%; min-width: 520px; height: 300px; display: block; }
+  .race .grid { stroke: var(--line); stroke-width: 1; }
+  .race .axis { font-size: 10px; fill: var(--muted-2); }
+  .race .lbl { font-size: 11px; font-weight: 800; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 5px; }
+  .legend span { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+
+  /* pre-tournament odds table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; color: var(--muted-2); font-weight: 700;
+    padding: 0 8px 8px; letter-spacing: .04em; }
+  td { padding: 8px; border-top: 1px solid var(--line); }
+  tr.champ td { background: var(--gold-soft); font-weight: 800; }
+  .rank { color: var(--muted-2); font-variant-numeric: tabular-nums; width: 30px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--blue); min-width: 2px; }
+  .barcell { width: 40%; }
+  .pct { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; width: 56px; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .stat { background: var(--surface-soft); border-radius: 12px; padding: 13px; }
+  .stat b { display: block; font-size: 23px; font-weight: 900; line-height: 1.15; }
+  .stat span { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+
+  /* bracket */
+  .bracket { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+  .round { min-width: 176px; flex: 0 0 auto; }
+  .round h3 { font-size: 11px; color: var(--muted-2); font-weight: 800; margin: 0 0 8px;
+    letter-spacing: .05em; text-transform: uppercase; }
+  .tie { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 10px; margin-bottom: 8px; font-size: 12px; }
+  .tie .row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; color: var(--muted); }
+  .tie .row.w { color: var(--ink); font-weight: 800; }
+  .tie .meta { font-size: 10.5px; color: var(--muted-2); margin-top: 4px; }
+
+  /* match list */
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .filters button { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+  .filters button.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .mlist { display: grid; gap: 6px; }
+  .m { display: grid; grid-template-columns: 62px 1fr auto; gap: 10px; align-items: center;
+    background: var(--surface-soft); border-radius: 9px; padding: 9px 11px; font-size: 13px; }
+  .m .d { font-size: 11px; color: var(--muted-2); font-variant-numeric: tabular-nums; }
+  .m .t { min-width: 0; }
+  .m .s { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .m .s small { font-weight: 600; color: var(--muted-2); font-size: 10.5px; margin-left: 5px; }
+
+  .note-box { font-size: 12px; color: var(--muted); background: var(--surface-soft);
+    border-radius: 10px; padding: 12px 14px; line-height: 1.65; }
+  .note-box b { color: var(--ink); }
+  footer { color: var(--muted-2); font-size: 11.5px; text-align: center; padding: 26px 0 34px; line-height: 1.6; }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px; text-align: center; }
+
+  @media (max-width: 560px) {
+    .hero .name { font-size: 27px; }
+    .final .score { font-size: 25px; }
+    .m { grid-template-columns: 52px 1fr auto; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap topbar-inner">
+  <a class="back" href="/">← 返回</a>
+  <h1>2026 世界杯回顾</h1>
+</div></div>
+
+<div class="wrap">
+  <section id="hero"></section>
+  <section id="final"></section>
+
+  <section class="card">
+    <h2>夺冠概率赛马图</h2>
+    <p class="sub">整届赛事各队夺冠概率的演变（Polymarket 市场价）。这是本届唯一完整保留的时间序列数据。</p>
+    <div class="chart-wrap"><svg class="race" id="race" viewBox="0 0 860 300" preserveAspectRatio="none"></svg></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="card">
+    <h2>赛前夺冠概率</h2>
+    <p class="sub">开赛前（2026-06-11）市场对各队的定价。</p>
+    <table id="preodds"></table>
+  </section>
+
+  <section class="card">
+    <h2>市场准不准？</h2>
+    <p class="sub">用实际结果检验 Polymarket 的定价水平。</p>
+    <div class="stats" id="calib"></div>
+    <div class="note-box" id="calib-note" style="margin-top:14px"></div>
+  </section>
+
+  <section class="card">
+    <h2>淘汰赛对阵</h2>
+    <p class="sub">晋级者取自 <code>team to advance</code> 盘口结算值，而非 90 分钟赛果（淘汰赛可能打平进加时）。</p>
+    <div class="bracket" id="bracket"></div>
+  </section>
+
+  <section class="card">
+    <h2>赛事数据</h2>
+    <div class="stats" id="tstats"></div>
+  </section>
+
+  <section class="card">
+    <h2>全部比赛</h2>
+    <div class="filters" id="filters"></div>
+    <div class="mlist" id="mlist"></div>
+  </section>
+
+  <section class="card">
+    <h2>关于这份数据</h2>
+    <div class="note-box" id="caveats"></div>
+  </section>
+
+  <footer>
+    数据来源：Polymarket Gamma API（series 11433）<br>
+    <span id="gen"></span>
+  </footer>
+</div>
+
+<script>
+// Flag/colour come from teams.json (Polymarket's own team logos) — never
+// guess an image URL, just hide the <img> when a team has none.
+let TEAMS = {};
+const flagOf = t => (TEAMS[t] && TEAMS[t].flag) || "";
+const colorOf = t => (TEAMS[t] && TEAMS[t].color) || "var(--blue)";
+const flagImg = (team, cls) => {
+  const src = flagOf(team);
+  return src ? `<img ${cls?`class="${cls}" `:""}src="${esc(src)}" alt="" onerror="this.style.display='none'">` : "";
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pct = p => (p*100).toFixed(1) + "%";
+const CN = {Spain:"西班牙",Argentina:"阿根廷",France:"法国",England:"英格兰",Portugal:"葡萄牙",Brazil:"巴西",
+  Germany:"德国",Netherlands:"荷兰",Italy:"意大利",Norway:"挪威",Belgium:"比利时",Colombia:"哥伦比亚",
+  Japan:"日本",Morocco:"摩洛哥",Mexico:"墨西哥",Croatia:"克罗地亚",Uruguay:"乌拉圭",Switzerland:"瑞士",
+  Senegal:"塞内加尔",Denmark:"丹麦","United States":"美国",USA:"美国",Canada:"加拿大",Ecuador:"厄瓜多尔",
+  Australia:"澳大利亚",Tunisia:"突尼斯",Iran:"伊朗","South Korea":"韩国",Paraguay:"巴拉圭",Jordan:"约旦",
+  Uzbekistan:"乌兹别克斯坦","New Zealand":"新西兰",Austria:"奥地利",Algeria:"阿尔及利亚",Qatar:"卡塔尔",
+  Poland:"波兰",Ghana:"加纳",Egypt:"埃及","Saudi Arabia":"沙特",Iraq:"伊拉克","South Africa":"南非",
+  "Cabo Verde":"佛得角",Haiti:"海地",Panama:"巴拿马","Costa Rica":"哥斯达黎加","Ivory Coast":"科特迪瓦",
+  "Côte d'Ivoire":"科特迪瓦","DR Congo":"刚果金","Bosnia-Herzegovina":"波黑","Bosnia and Herzegovina":"波黑",
+  Sweden:"瑞典","Curaçao":"库拉索",Curacao:"库拉索","Team AM":"待定"};
+const cn = t => CN[t] || t;
+const STAGE_CN = {Group:"小组赛","Round of 32":"32强","Round of 16":"16强",Quarterfinal:"1/4决赛",
+  Semifinal:"半决赛","Third place":"季军战",Final:"决赛"};
+
+const PALETTE = ["#b7791f","#1652f0","#079455","#b42318","#7c3aed","#0891b2","#db2777","#ea580c"];
+
+let DATA = {};
+
+async function load() {
+  const [meta, matches, race, teams] = await Promise.all([
+    fetch("data/wc2026/meta.json").then(r=>r.json()),
+    fetch("data/wc2026/matches.json").then(r=>r.json()),
+    fetch("data/wc2026/title-race.json").then(r=>r.json()),
+    fetch("data/wc2026/teams.json").then(r=>r.json()).catch(()=>[]),
+  ]);
+  TEAMS = Object.fromEntries((teams||[]).map(t => [t.name, t]));
+  DATA = { meta, matches, race };
+  renderHero(); renderFinal(); renderRace(); renderPreOdds();
+  renderCalib(); renderBracket(); renderStats(); renderMatches(); renderCaveats();
+  document.getElementById("gen").textContent = "生成于 " + new Date(meta.generatedAt).toLocaleString("zh-CN");
+}
+
+function champion() { return DATA.race.find(t => t.champion); }
+function finalMatch() { return DATA.matches.find(m => m.stage === "Final"); }
+
+function renderHero() {
+  const c = champion(), f = finalMatch();
+  if (!c) return;
+  const pre = c.preTournamentProb;
+  document.getElementById("hero").innerHTML = `
+    <div class="hero">
+      <div class="tag">2026 FIFA WORLD CUP</div>
+      ${flagImg(c.team, "flag")}
+      <div class="name">${esc(cn(c.team))}</div>
+      <div class="note">世界杯冠军${f ? `　·　决赛 ${esc(f.score || "")}${f.wentToExtra ? "（加时）" : ""}${f.hadShootout ? "（点球）" : ""}` : ""}</div>
+      ${pre != null ? `<div class="odds">赛前市场给出 ${pct(pre)} 夺冠概率 · 全场最高</div>` : ""}
+    </div>`;
+}
+
+function renderFinal() {
+  const f = finalMatch();
+  if (!f) return;
+  const [hg, ag] = (f.score || "-").split("-");
+  const w = f.advanced;
+  document.getElementById("final").innerHTML = `
+    <div class="card">
+      <h2>决赛</h2>
+      <p class="sub">${esc((f.date||"").slice(0,10))}</p>
+      <div class="final">
+        <div class="side">
+          ${flagImg(f.home)}
+          <b class="${w===f.home?"won":""}">${esc(cn(f.home))}</b>
+        </div>
+        <div class="score">${esc(hg)} <span style="color:var(--muted-2)">-</span> ${esc(ag)}</div>
+        <div class="side">
+          ${flagImg(f.away)}
+          <b class="${w===f.away?"won":""}">${esc(cn(f.away))}</b>
+        </div>
+      </div>
+      <div class="chips">
+        <span class="chip">90 分钟 ${esc(f.result90==="Draw"?"战平":cn(f.result90||""))}</span>
+        ${f.wentToExtra ? `<span class="chip hot">进入加时</span>` : ""}
+        ${f.hadShootout ? `<span class="chip hot">点球大战</span>` : `<span class="chip">未打点球</span>`}
+        ${w ? `<span class="chip hot">🏆 ${esc(cn(w))} 夺冠</span>` : ""}
+      </div>
+    </div>`;
+}
+
+function renderRace() {
+  const svg = document.getElementById("race");
+  const teams = DATA.race.filter(t => t.tradeable && t.series && t.series.length > 20)
+    .map(t => ({...t, peak: Math.max(...t.series.map(p=>p.p))}))
+    .sort((a,b) => b.peak - a.peak).slice(0, 6);
+  if (!teams.length) { svg.outerHTML = `<div class="empty">暂无曲线数据</div>`; return; }
+
+  const all = teams.flatMap(t => t.series);
+  const t0 = Math.min(...all.map(p=>p.t)), t1 = Math.max(...all.map(p=>p.t));
+  const W = 860, H = 300, L = 34, R = 92, T = 14, B = 24;
+  const x = t => L + (t - t0) / (t1 - t0 || 1) * (W - L - R);
+  const y = p => T + (1 - p) * (H - T - B);
+
+  let out = "";
+  for (let i = 0; i <= 4; i++) {
+    const p = i / 4, yy = y(p);
+    out += `<line class="grid" x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}"></line>`;
+    out += `<text class="axis" x="4" y="${yy+3}">${p*100}%</text>`;
+  }
+  const days = (t1 - t0) / 86400;
+  for (let i = 0; i <= 4; i++) {
+    const tt = t0 + (t1-t0) * i/4;
+    out += `<text class="axis" x="${x(tt)}" y="${H-6}" text-anchor="middle">${new Date(tt*1000).toISOString().slice(5,10)}</text>`;
+  }
+  teams.forEach((t, i) => {
+    const col = (TEAMS[t.team] && TEAMS[t.team].color) || PALETTE[i % PALETTE.length];
+    const d = t.series.map((p, j) => `${j?"L":"M"}${x(p.t).toFixed(1)},${y(p.p).toFixed(1)}`).join("");
+    out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${t.champion?2.6:1.7}"
+            opacity="${t.champion?1:.75}" stroke-linejoin="round"></path>`;
+    const last = t.series[t.series.length-1];
+    out += `<text class="lbl" x="${W-R+6}" y="${Math.min(H-B, Math.max(T+9, y(last.p)+4))}" fill="${col}">${esc(cn(t.team))}</text>`;
+  });
+  svg.innerHTML = out;
+  document.getElementById("legend").innerHTML = teams.map((t,i) =>
+    `<span><i style="background:${(TEAMS[t.team]&&TEAMS[t.team].color)||PALETTE[i%PALETTE.length]}"></i>${esc(cn(t.team))}${t.champion?" 🏆":""}</span>`).join("");
+}
+
+function renderPreOdds() {
+  const rows = DATA.race.filter(t => t.preTournamentProb != null && t.tradeable)
+    .sort((a,b) => b.preTournamentProb - a.preTournamentProb).slice(0, 15);
+  if (!rows.length) { document.getElementById("preodds").innerHTML = `<tr><td class="empty">暂无赛前概率数据（请重新运行导出脚本）</td></tr>`; return; }
+  const max = rows[0].preTournamentProb;
+  document.getElementById("preodds").innerHTML =
+    `<tr><th>#</th><th>球队</th><th class="barcell"></th><th class="pct">概率</th></tr>` +
+    rows.map((t,i) => `<tr class="${t.champion?"champ":""}">
+      <td class="rank">${i+1}</td>
+      <td>${esc(cn(t.team))}${t.champion?" 🏆":""}</td>
+      <td class="barcell"><div class="bar" style="width:${(t.preTournamentProb/max*100).toFixed(1)}%;
+        background:${t.champion?"var(--gold)":"var(--blue)"}"></div></td>
+      <td class="pct">${pct(t.preTournamentProb)}</td></tr>`).join("");
+}
+
+function renderCalib() {
+  const live = DATA.race.filter(t => t.preTournamentProb != null && t.tradeable);
+  const el = document.getElementById("calib");
+  if (!live.length) { el.innerHTML = `<div class="empty">需要重新运行导出脚本以生成赛前概率</div>`; return; }
+  const sorted = [...live].sort((a,b)=>b.preTournamentProb-a.preTournamentProb);
+  const champRank = sorted.findIndex(t=>t.champion) + 1;
+  const sum = live.reduce((s,t)=>s+t.preTournamentProb, 0);
+  const semi = ["Semifinal"].flatMap(s => DATA.matches.filter(m=>m.stage===s)).flatMap(m=>[m.home,m.away]);
+  const top5 = sorted.slice(0,5).map(t=>t.team);
+  const semiInTop5 = [...new Set(semi)].filter(t => top5.includes(t)).length;
+
+  el.innerHTML = `
+    <div class="stat"><b>第 ${champRank||"-"} 位</b><span>冠军的赛前排名</span></div>
+    <div class="stat"><b>${sum.toFixed(2)}</b><span>概率总和（1.0 为无抽水）</span></div>
+    <div class="stat"><b>${semiInTop5}/${[...new Set(semi)].length}</b><span>四强来自赛前 top5</span></div>`;
+
+  document.getElementById("calib-note").innerHTML =
+    `<b>结论：市场定价很准。</b>冠军西班牙就是赛前第 ${champRank} 热门；概率总和仅 ${sum.toFixed(2)}，
+     意味着做市抽水约 ${((sum-1)*100).toFixed(0)}%，远低于传统博彩公司的 10–20%，是个高效率市场。
+     换句话说，靠“找错误定价”套利的空间很小，但它非常适合当作评判预测水平的<b>基准线</b>。`;
+}
+
+function renderBracket() {
+  const order = ["Round of 32","Round of 16","Quarterfinal","Semifinal","Final"];
+  const html = order.map(st => {
+    const ms = DATA.matches.filter(m => m.stage === st);
+    if (!ms.length) return "";
+    return `<div class="round"><h3>${STAGE_CN[st]||st}</h3>` + ms.map(m => {
+      const w = m.advanced;
+      const line = (team) => `<div class="row ${w===team?"w":""}"><span>${esc(cn(team))}</span>${w===team?"<span>✓</span>":""}</div>`;
+      const extra = [m.wentToExtra?"加时":"", m.hadShootout?"点球":""].filter(Boolean).join(" · ");
+      return `<div class="tie">${line(m.home)}${line(m.away)}
+        <div class="meta">${esc(m.score||"")}${extra?" · "+extra:""}${!w?" · 晋级者未知":""}</div></div>`;
+    }).join("") + `</div>`;
+  }).join("");
+  document.getElementById("bracket").innerHTML = html || `<div class="empty">暂无淘汰赛数据</div>`;
+}
+
+function renderStats() {
+  const M = DATA.matches;
+  const dec = M.filter(m => m.result90);
+  const hw = dec.filter(m=>m.result90===m.home).length;
+  const dr = dec.filter(m=>m.result90==="Draw").length;
+  const aw = dec.filter(m=>m.result90===m.away).length;
+  const sc = M.filter(m=>m.score).map(m=>m.score.split("-").map(Number)).filter(a=>a.every(Number.isFinite));
+  const tot = sc.map(s=>s[0]+s[1]);
+  const avg = tot.length ? (tot.reduce((a,b)=>a+b,0)/tot.length) : 0;
+  const o25 = tot.length ? tot.filter(t=>t>2.5).length/tot.length*100 : 0;
+  const ko = M.filter(m=>m.stage!=="Group");
+  document.getElementById("tstats").innerHTML = `
+    <div class="stat"><b>${M.length}</b><span>总场次</span></div>
+    <div class="stat"><b>${avg.toFixed(2)}</b><span>场均进球</span></div>
+    <div class="stat"><b>${(hw/dec.length*100).toFixed(0)}%</b><span>主队 90 分钟胜率</span></div>
+    <div class="stat"><b>${(dr/dec.length*100).toFixed(0)}%</b><span>平局率</span></div>
+    <div class="stat"><b>${o25.toFixed(0)}%</b><span>大 2.5 球</span></div>
+    <div class="stat"><b>${ko.filter(m=>m.wentToExtra).length}</b><span>加时场次</span></div>
+    <div class="stat"><b>${ko.filter(m=>m.hadShootout).length}</b><span>点球大战</span></div>`;
+}
+
+let filter = "all";
+function renderMatches() {
+  const stages = ["all", ...new Set(DATA.matches.map(m=>m.stage))];
+  document.getElementById("filters").innerHTML = stages.map(s =>
+    `<button class="${s===filter?"on":""}" data-s="${esc(s)}">${s==="all"?"全部":(STAGE_CN[s]||s)}</button>`).join("");
+  const list = DATA.matches.filter(m => filter==="all" || m.stage===filter);
+  document.getElementById("mlist").innerHTML = list.map(m => `
+    <div class="m">
+      <span class="d">${esc((m.date||"").slice(5,10))}</span>
+      <span class="t">${esc(cn(m.home))} <span style="color:var(--muted-2)">vs</span> ${esc(cn(m.away))}</span>
+      <span class="s">${esc(m.score||"–")}${m.wentToExtra?'<small>加时</small>':""}${m.hadShootout?'<small>点球</small>':""}</span>
+    </div>`).join("") || `<div class="empty">无比赛</div>`;
+}
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button[data-s]"); if (!b) return;
+  filter = b.dataset.s; renderMatches();
+});
+
+function renderCaveats() {
+  document.getElementById("caveats").innerHTML =
+    (DATA.meta.caveats || []).map(c => "· " + esc(c)).join("<br>") +
+    `<br><br><b>数据完整度：</b>${DATA.matches.length} 场比赛，
+     ${DATA.matches.filter(m=>m.score).length} 场有比分，
+     ${DATA.race.filter(t=>t.tradeable).length} 支球队有可用的夺冠概率曲线。`;
+}
+
+load().catch(e => {
+  document.querySelector(".wrap").insertAdjacentHTML("afterbegin",
+    `<div class="card" style="margin-top:20px"><div class="empty">数据加载失败：${esc(e.message)}<br><br>
+     请确认 <code>public/data/wc2026/</code> 下有导出的 JSON 文件。</div></div>`);
+});
+</script>
+</body>
+</html>

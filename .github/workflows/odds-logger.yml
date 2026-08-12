@@ -1,0 +1,52 @@
+name: Odds Logger
+
+# Captures Polymarket soccer odds on a schedule and commits them back.
+# WHY: Polymarket permanently deletes a match's price history once it closes,
+# so "pre-match odds vs actual result" can only ever be captured live.
+on:
+  schedule:
+    # Every 10 minutes. GitHub delays scheduled runs under load (5-20 min is
+    # normal), so treat this as "roughly every 10-20 min", not a guarantee.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:      # allow manual runs from the Actions tab
+
+# Prevent overlapping runs from racing on the same commit.
+concurrency:
+  group: odds-logger
+  cancel-in-progress: false
+
+permissions:
+  contents: write         # needed to commit the captured data back
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Capture odds
+        run: node scripts/odds-logger.mjs --once --days=7
+
+      - name: Commit data
+        run: |
+          git config user.name  "odds-logger[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/odds-log
+          if git diff --staged --quiet; then
+            echo "No new odds data — nothing to commit."
+            exit 0
+          fi
+          git commit -m "odds: $(date -u '+%Y-%m-%d %H:%M') UTC"
+          # Another scheduled run may have landed first; rebase and retry.
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push && exit 0
+            echo "push attempt $i failed, retrying…"
+            sleep 5
+          done
+          echo "::error::could not push odds data after 3 attempts"
+          exit 1
