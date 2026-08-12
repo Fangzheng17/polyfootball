@@ -3636,10 +3636,19 @@
     }
 
     function isFixtureCompleted(fx) {
-      if (fx.closed) return true;
+      if (fx.closed || fx.ended) return true;
       const t = new Date(fx.kickoff).getTime();
       if (!Number.isFinite(t)) return false;
-      return Date.now() > t + 3 * 60 * 60 * 1000;
+      if (Date.now() > t + 3 * 60 * 60 * 1000) return true;
+      // Polymarket often leaves an event open for a while after the result is
+      // decided, so the odds settle to 100/0 before `closed` flips. Once
+      // kickoff has passed, a pinned price means the match is over — drop it
+      // rather than showing a dead "BMG 100%" card among upcoming matches.
+      if (Date.now() > t && !fx.live) {
+        const prices = (fx.moneyline || []).map(o => Number(o.price)).filter(Number.isFinite);
+        if (prices.length && Math.max(...prices) >= 0.97) return true;
+      }
+      return false;
     }
 
     // Align the small flags to the team-name glyph regardless of the device's CJK font.
